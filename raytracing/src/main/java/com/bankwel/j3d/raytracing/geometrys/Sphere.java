@@ -2,12 +2,11 @@ package com.bankwel.j3d.raytracing.geometrys;
 
 import javax.validation.constraints.NotNull;
 
-import com.bankwel.j3d.raytracing.core.Geometry;
 import com.bankwel.j3d.raytracing.core.Ray;
 import com.bankwel.j3d.raytracing.core.Ray.Intensity;
 import com.bankwel.j3d.raytracing.core.Vector;
 
-public class Sphere implements Geometry {
+public class Sphere {
 
 	private Vector center;
 	private float radius;
@@ -45,8 +44,7 @@ public class Sphere implements Geometry {
 		this.index = index;
 	}
 
-	@Override
-	public boolean intersectWith(Ray ray) {
+	public boolean isIntersectedWith(Ray ray) {
 		Vector u = ray.getDirection();
 		Vector p0 = ray.getOrigin();
 		Vector p = center;
@@ -59,20 +57,18 @@ public class Sphere implements Geometry {
 		float s = udp - (float) Math.sqrt(delta);
 		if (s < 0)
 			return false;
-		I = p0.plus(u.times(s));
+		I = p0.plus(u.mul(s));
 		N = I.sub(p).normalize();
 		return true;
 	}
 
-	@Override
 	public Ray reflect(Ray ray) {
 		if (N == null)
 			return null;
-		ray.setIntensity(new Intensity(1,1,1));
+		ray.setIntensity(new Intensity(1, 1, 1));
 		return ray.reflectedBy(I, N);
 	}
 
-	@Override
 	public Ray refract(Ray ray) {
 		if (N == null)
 			return null;
@@ -80,9 +76,10 @@ public class Sphere implements Geometry {
 	}
 
 	public static void main(String[] args) {
-		Geometry geometry = new Sphere(new Vector(2, 0, 0), 3);
-		Ray ray = new Ray(new Vector(-2, 1, 0), new Vector(1, 0, 0));
-		System.out.println(geometry.intersectWith(ray));
+		Sphere geometry = new Sphere(new Vector(2, 0, 0), 1);
+		geometry.setIndex(2);
+		Ray ray = new Ray(new Vector(), new Vector(1, (float) Math.sqrt(3) / 3 - 0.1f, 0));
+		System.out.println(geometry.isIntersectedWith(ray));
 		System.out.println(geometry.reflect(ray));
 		System.out.println(geometry.refract(ray));
 	}

@@ -36,7 +36,7 @@ public class Vector {
 		return x * v.x + y * v.y + z * v.z;
 	}
 
-	public Vector times(float f) {
+	public Vector mul(float f) {
 		return new Vector(this.x * f, this.y * f, this.z * f);
 	}
 

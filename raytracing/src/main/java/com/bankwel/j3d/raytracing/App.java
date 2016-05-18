@@ -12,6 +12,7 @@ import com.bankwel.j3d.raytracing.geometrys.Sphere;
 import com.bankwel.j3d.raytracing.plugins.UI;
 
 public class App {
+	
 	public static void main(String[] args) {
 
 		BufferedImage image = new BufferedImage(600, 400, BufferedImage.TYPE_INT_ARGB);
@@ -23,11 +24,10 @@ public class App {
 		}
 
 		Scene scene = new Scene();
-		Sphere sphere = new Sphere(new Vector(), 50);
+		Sphere sphere = new Sphere(new Vector(300,200,100), 100);
 		sphere.setIndex(2);
-		scene.addGeom(sphere);
 
-		Vector viewPoint = new Vector(-500, 0, 0);
+		Vector viewPoint = new Vector(300, 200, -200);
 		pixels.forEach(pixel -> {
 			Ray ray = pixel.ray(viewPoint);
 			scene.trace(ray);

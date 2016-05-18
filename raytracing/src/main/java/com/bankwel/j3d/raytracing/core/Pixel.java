@@ -5,16 +5,13 @@ import java.awt.image.BufferedImage;
 
 import javax.validation.constraints.NotNull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class Pixel {
 
 	private int x;
 	private int y;
 	private int rgb;
 
-	private static final Logger logger = LoggerFactory.getLogger(Pixel.class);
+	//private static final Logger logger = LoggerFactory.getLogger(Pixel.class);
 
 	public Pixel(int x, int y) {
 		this.x = x;

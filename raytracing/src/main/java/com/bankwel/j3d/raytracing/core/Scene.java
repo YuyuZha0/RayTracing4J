@@ -1,7 +1,6 @@
 package com.bankwel.j3d.raytracing.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -13,53 +12,76 @@ import com.bankwel.j3d.raytracing.core.Ray.Intensity;
 
 public class Scene {
 
-	private List<Geometry> geometrys = new ArrayList<Geometry>();
+	private List<Lightable> sources = new ArrayList<Lightable>();
+	private List<Unlightable> objects = new ArrayList<Unlightable>();
+
+	private Intensity backgroud = new Intensity();
 
 	private static final Logger logger = LoggerFactory.getLogger(Scene.class);
 
 	public Scene addGeom(@NotNull Geometry geometry) {
-		geometrys.add(geometry);
-		logger.info("Geometry has been added to the scene.");
+		if (geometry instanceof Lightable) {
+			sources.add((Lightable) geometry);
+			logger.info("Geometry recognized as Lightable has been added to the scene.");
+		} else if (geometry instanceof Unlightable) {
+			objects.add((Unlightable) geometry);
+			logger.info("Geometry recognized as Unlightable has been added to the scene.");
+		} else {
+			logger.info("Geometry does not seem to have a specified type with Lightable or Unlightable");
+		}
+
 		return this;
 	}
 
-	public Scene addGemo(@NotNull Collection<Geometry> c) {
-		geometrys.addAll(c);
-		logger.info("Geometries has been added to the scene.");
+	public Scene backgroud(@NotNull Intensity backgroud) {
+		this.backgroud = backgroud;
 		return this;
 	}
 
 	public void trace(@NotNull Ray ray) {
-		Geometry geometry = getNearestGeometry(ray);
 		int depth = ray.getDepth();
-		if (geometry == null || depth > Config.MAX_DEPTH) {
-			stopTracing(ray);
+		if (depth > Config.MAX_DEPTH)
+			return;
+
+		float min = 0;
+		Geometry geom = null;
+
+		for (Geometry source : sources) {
+			float solution = -source.soluteRayEquation(ray);
+			if (solution < 0 && solution > min) {
+				min = solution;
+				geom = source;
+			}
+		}
+
+		for (Geometry object : objects) {
+			float solution = -object.soluteRayEquation(ray);
+			if (solution < 0 && solution > min) {
+				min = solution;
+				geom = object;
+			}
+		}
+		min = -min;
+		if (geom == null) {
+			ray.setIntensity(backgroud);
 			return;
 		}
-		Ray r = geometry.reflect(ray);
-		if (r != null) {
-			r.setDepth(depth + 1);
-			trace(r);
+		if (geom instanceof Lightable) {
+			Lightable lightable = (Lightable) geom;
+			ray.setIntensity(lightable.directIntensity());
+			return;
 		}
-		Ray t = geometry.refract(ray);
-		if (t != null) {
-			t.setDepth(depth + 1);
-			trace(t);
+		if (!(geom instanceof Unlightable)) {
+			return;
 		}
-		ray.setSecondaryRef(r);
-		ray.setSecondaryTrans(t);
-		// logger.info("[{}] has been successfully traced.", ray);
-	}
-
-	private Geometry getNearestGeometry(Ray ray) {
-		Geometry geometry = geometrys.get(0);
-		if (geometry.intersectWith(ray))
-			return geometry;
-		return null;
-	}
-
-	private void stopTracing(@NotNull Ray ray) {
-		ray.setIntensity(new Intensity(0, 0, 0));
+		Unlightable unlightable = (Unlightable) geom;
+		Vector u = ray.getDirection();
+		Vector p0 = ray.getOrigin();
+		Vector i = p0.plus(u.mul(min));
+		Vector n = unlightable.normalAt(i);
+		
+		Ray r = ray.reflectedBy(i, n);
+		
 	}
 
 }

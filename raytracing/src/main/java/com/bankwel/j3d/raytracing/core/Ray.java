@@ -90,7 +90,7 @@ public class Ray {
 	 */
 	public Ray reflectedBy(@NotNull Vector i, @NotNull Vector n) {
 		Vector u = direction;
-		return new Ray(i, u.sub(n.times(2 * u.dot(n))));
+		return new Ray(i, u.sub(n.mul(2 * u.dot(n))));
 	}
 
 	/**
@@ -107,15 +107,15 @@ public class Ray {
 		Vector u = direction;
 		double cosI = Math.abs(u.dot(n));
 		double cosR = Math.sqrt((cosI * cosI - 1) / index / index + 1);
-		return new Ray(i, u.times(1 / index).sub(n.times((float) (cosR - cosI / index))));
+		return new Ray(i, u.mul(1 / index).sub(n.mul((float) (cosR - cosI / index))));
 	}
 
 	public Intensity totalIntensity() {
 		Intensity itn = intensity;
 		if (secondaryRef != null)
-			itn = itn.combine(secondaryRef.totalIntensity());
+			itn = itn.plus(secondaryRef.totalIntensity());
 		if (secondaryTrans != null)
-			itn = itn.combine(secondaryTrans.totalIntensity());
+			itn = itn.plus(secondaryTrans.totalIntensity());
 		return itn;
 	}
 
@@ -132,50 +132,39 @@ public class Ray {
 		}
 
 		public Intensity(float ir, float ig, float ib) {
-			this.ir = ir;
-			this.ig = ig;
-			this.ib = ib;
+			ir = Math.abs(ir);
+			ig = Math.abs(ig);
+			ib = Math.abs(ib);
+			float max = Math.max(ir, Math.max(ig, ib));
+			if (max == 0)
+				max = 1;
+			this.ir = ir / max;
+			this.ig = ig / max;
+			this.ib = ib / max;
 		}
 
 		public float getIr() {
 			return ir;
 		}
 
-		public void setIr(float ir) {
-			this.ir = ir;
-		}
-
 		public float getIg() {
 			return ig;
-		}
-
-		public void setIg(float ig) {
-			this.ig = ig;
 		}
 
 		public float getIb() {
 			return ib;
 		}
 
-		public void setIb(float ib) {
-			this.ib = ib;
-		}
-
-		public Intensity combine(Intensity i) {
+		public Intensity plus(Intensity i) {
 			return new Intensity(ir + i.getIr(), ig + i.getIg(), ib + i.getIb());
 		}
 
-		public Intensity attenuate(float a) {
-			return new Intensity(a * ir, a * ig, a * ib);
-		}
-
-		public Intensity attenuate(float a, float b, float c) {
-			return new Intensity(a * ir, b * ig, c * ib);
+		public Intensity mul(Intensity i) {
+			return new Intensity(ir * i.getIr(), ig * i.getIg(), ib * i.getIb());
 		}
 
 		public Color toColor() {
-			float i = (float) Math.sqrt(ir * ir + ig * ig + ib * ib);
-			return new Color(ir / i, ig / i, ib / i);
+			return new Color(ir, ig, ib);
 		}
 
 	}

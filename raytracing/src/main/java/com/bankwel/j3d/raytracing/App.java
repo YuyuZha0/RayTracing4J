@@ -25,6 +25,7 @@ public class App {
 
 		Scene scene = new Scene();
 		Sphere sphere = new Sphere(new Vector(300,200,100), 100);
+		scene.add(sphere);
 		sphere.setIndex(2);
 
 		Vector viewPoint = new Vector(300, 200, -200);

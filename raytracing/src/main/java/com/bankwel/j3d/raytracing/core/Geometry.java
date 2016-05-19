@@ -3,10 +3,24 @@ package com.bankwel.j3d.raytracing.core;
 public interface Geometry {
 
 	/**
-	 * If solution exists,solution > 0
+	 * The solution of p = p0 + x*u(x>0)
 	 * 
 	 * @param ray
 	 * @return
 	 */
-	float soluteRayEquation(Ray ray);
+	float intersection(Ray ray) throws NoSolutionException;
+
+	static class NoSolutionException extends Exception {
+
+		private static final long serialVersionUID = -5379972296551058289L;
+
+		public NoSolutionException() {
+			super();
+		}
+
+		public NoSolutionException(String msg) {
+			super(msg);
+		}
+	}
+
 }

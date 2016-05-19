@@ -110,12 +110,12 @@ public class Ray {
 		return new Ray(i, u.mul(1 / index).sub(n.mul((float) (cosR - cosI / index))));
 	}
 
-	public Intensity totalIntensity() {
+	public Intensity countIntensity() {
 		Intensity itn = intensity;
 		if (secondaryRef != null)
-			itn = itn.plus(secondaryRef.totalIntensity());
+			itn = itn.plus(secondaryRef.countIntensity());
 		if (secondaryTrans != null)
-			itn = itn.plus(secondaryTrans.totalIntensity());
+			itn = itn.plus(secondaryTrans.countIntensity());
 		return itn;
 	}
 
@@ -135,12 +135,10 @@ public class Ray {
 			ir = Math.abs(ir);
 			ig = Math.abs(ig);
 			ib = Math.abs(ib);
-			float max = Math.max(ir, Math.max(ig, ib));
-			if (max == 0)
-				max = 1;
-			this.ir = ir / max;
-			this.ig = ig / max;
-			this.ib = ib / max;
+
+			this.ir = ir;
+			this.ig = ig;
+			this.ib = ib;
 		}
 
 		public float getIr() {
@@ -164,7 +162,9 @@ public class Ray {
 		}
 
 		public Color toColor() {
-			return new Color(ir, ig, ib);
+			float max = Math.max(Math.max(ir, ig), ib);
+			max = Math.max(1, max);
+			return new Color(ir / max, ig / max, ib / max);
 		}
 
 	}

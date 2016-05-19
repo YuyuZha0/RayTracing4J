@@ -4,16 +4,14 @@ import javax.validation.constraints.NotNull;
 
 import com.bankwel.j3d.raytracing.core.Ray;
 import com.bankwel.j3d.raytracing.core.Ray.Intensity;
+import com.bankwel.j3d.raytracing.core.Unlightable;
 import com.bankwel.j3d.raytracing.core.Vector;
 
-public class Sphere {
+public class Sphere implements Unlightable {
 
 	private Vector center;
 	private float radius;
 	private float index = 1;
-
-	private Vector I = null;
-	private Vector N = null;
 
 	public Sphere(@NotNull Vector center, float radius) {
 		this.center = center;
@@ -44,7 +42,8 @@ public class Sphere {
 		this.index = index;
 	}
 
-	public boolean isIntersectedWith(Ray ray) {
+	@Override
+	public float intersection(Ray ray) throws NoSolutionException {
 		Vector u = ray.getDirection();
 		Vector p0 = ray.getOrigin();
 		Vector p = center;
@@ -53,35 +52,40 @@ public class Sphere {
 		float udp = u.dot(dp);
 		float delta = udp * udp - dp.dot(dp) + r * r;
 		if (delta < 0)
-			return false;
-		float s = udp - (float) Math.sqrt(delta);
-		if (s < 0)
-			return false;
-		I = p0.plus(u.mul(s));
-		N = I.sub(p).normalize();
-		return true;
+			throw new NoSolutionException();
+		float sqrt = (float) Math.sqrt(delta);
+		float s = udp - sqrt;
+		if (s <= 0) {
+			s = udp + sqrt;
+		}
+		if (s <= 0)
+			throw new NoSolutionException();
+		return s;
 	}
 
-	public Ray reflect(Ray ray) {
-		if (N == null)
-			return null;
-		ray.setIntensity(new Intensity(1, 1, 1));
-		return ray.reflectedBy(I, N);
+	@Override
+	public Vector normalAt(Vector point) {
+		return point.sub(center).normalize();
 	}
 
-	public Ray refract(Ray ray) {
-		if (N == null)
-			return null;
-		return ray.refractedBy(I, N, index);
+	@Override
+	public boolean isTransparentAt(Vector point) {
+		return false;
 	}
 
-	public static void main(String[] args) {
-		Sphere geometry = new Sphere(new Vector(2, 0, 0), 1);
-		geometry.setIndex(2);
-		Ray ray = new Ray(new Vector(), new Vector(1, (float) Math.sqrt(3) / 3 - 0.1f, 0));
-		System.out.println(geometry.isIntersectedWith(ray));
-		System.out.println(geometry.reflect(ray));
-		System.out.println(geometry.refract(ray));
+	@Override
+	public float indexAt(Vector point) {
+		return index;
+	}
+
+	@Override
+	public ReflectPolicy reflectPolicyAt(Vector point) {
+		return ReflectPolicy.DIFFUSE;
+	}
+
+	@Override
+	public Intensity intensityAt(Vector point) {
+		return new Intensity(1, 1, 1);
 	}
 
 }

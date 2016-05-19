@@ -161,6 +161,10 @@ public class Ray {
 			return new Intensity(ir * i.getIr(), ig * i.getIg(), ib * i.getIb());
 		}
 
+		public Intensity mul(float k) {
+			return new Intensity(k * ir, k * ig, k * ib);
+		}
+
 		public Color toColor() {
 			float max = Math.max(Math.max(ir, ig), ib);
 			max = Math.max(1, max);

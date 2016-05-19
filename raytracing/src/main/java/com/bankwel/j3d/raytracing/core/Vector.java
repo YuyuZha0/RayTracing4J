@@ -24,6 +24,10 @@ public class Vector {
 		this.z = z;
 	}
 
+	public Vector rev() {
+		return new Vector(-x, -y, -z);
+	}
+
 	public Vector plus(Vector v) {
 		return new Vector(this.x + v.x, this.y + v.y, this.z + v.z);
 	}
@@ -55,14 +59,7 @@ public class Vector {
 
 	@Override
 	public String toString() {
-		return new StringBuffer()
-				.append('<')
-				.append(x)
-				.append(',')
-				.append(y)
-				.append(',')
-				.append(z)
-				.append('>')
+		return new StringBuffer().append('<').append(x).append(',').append(y).append(',').append(z).append('>')
 				.toString();
 	}
 }

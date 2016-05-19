@@ -11,7 +11,8 @@ public class Pixel {
 	private int y;
 	private int rgb;
 
-	//private static final Logger logger = LoggerFactory.getLogger(Pixel.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(Pixel.class);
 
 	public Pixel(int x, int y) {
 		this.x = x;
@@ -48,8 +49,7 @@ public class Pixel {
 		this.rgb = rgb;
 	}
 
-	public void render(BufferedImage image) {
-		//logger.info("Rendering pixel {}.", this);
+	public void render(@NotNull BufferedImage image) {
 		image.setRGB(x, y, rgb);
 	}
 
@@ -64,7 +64,7 @@ public class Pixel {
 		buffer.append(')');
 		return buffer.toString();
 	}
-	
+
 	public static void main(String[] args) {
 		System.out.println(Color.BLACK.getRGB());
 	}

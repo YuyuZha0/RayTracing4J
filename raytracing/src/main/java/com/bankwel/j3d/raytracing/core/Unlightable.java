@@ -1,18 +1,20 @@
 package com.bankwel.j3d.raytracing.core;
 
+import javax.validation.constraints.NotNull;
+
 import com.bankwel.j3d.raytracing.core.Ray.Intensity;
 
 public interface Unlightable extends Geometry {
 
-	Vector normalAt(Vector point);
+	Vector normalAt(@NotNull Vector point);
 
-	boolean isTransparentAt(Vector point);
+	boolean isTransparentAt(@NotNull Vector point);
 
-	float indexAt(Vector point);
+	float indexAt(@NotNull Vector point);
 
-	ReflectPolicy reflectPolicyAt(Vector point);
+	ReflectPolicy reflectPolicyAt(@NotNull Vector point);
 
-	Intensity intensityAt(Vector point);
+	Intensity intensityAt(@NotNull Vector point);
 
 	enum ReflectPolicy {
 

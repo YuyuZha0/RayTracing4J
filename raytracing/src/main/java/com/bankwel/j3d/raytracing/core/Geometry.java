@@ -1,5 +1,7 @@
 package com.bankwel.j3d.raytracing.core;
 
+import javax.validation.constraints.NotNull;
+
 public interface Geometry {
 
 	/**
@@ -8,7 +10,7 @@ public interface Geometry {
 	 * @param ray
 	 * @return
 	 */
-	float intersection(Ray ray) throws NoSolutionException;
+	float intersection(@NotNull Ray ray) throws NoSolutionException;
 
 	static class NoSolutionException extends Exception {
 

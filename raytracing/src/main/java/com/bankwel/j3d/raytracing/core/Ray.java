@@ -132,13 +132,17 @@ public class Ray {
 		}
 
 		public Intensity(float ir, float ig, float ib) {
-			ir = Math.abs(ir);
-			ig = Math.abs(ig);
-			ib = Math.abs(ib);
+			ir = limit(ir);
+			ig = limit(ir);
+			ib = limit(ir);
 
 			this.ir = ir;
 			this.ig = ig;
 			this.ib = ib;
+		}
+
+		private float limit(float f) {
+			return Math.min(1, Math.abs(f));
 		}
 
 		public float getIr() {
@@ -165,10 +169,15 @@ public class Ray {
 			return new Intensity(k * ir, k * ig, k * ib);
 		}
 
+		public Intensity decline(@NotNull Vector vec) {
+			float n = vec.normal();
+			float k = 1 / (1 + n + n * n);
+			return mul(k);
+		}
+
 		public Color toColor() {
-			float max = Math.max(Math.max(ir, ig), ib);
-			max = Math.max(1, max);
-			return new Color(ir / max, ig / max, ib / max);
+
+			return new Color(ir, ig, ib);
 		}
 
 	}

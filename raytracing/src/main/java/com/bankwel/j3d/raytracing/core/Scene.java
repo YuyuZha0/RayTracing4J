@@ -14,7 +14,7 @@ import com.bankwel.j3d.raytracing.core.Ray.Intensity;
 public class Scene {
 
 	private List<Lightable> sources = new ArrayList<Lightable>();
-	private List<Unlightable> objects = new ArrayList<Unlightable>();
+	private List<Surface> objects = new ArrayList<Surface>();
 
 	private Intensity backgroud = new Intensity();
 
@@ -24,8 +24,8 @@ public class Scene {
 		if (geometry instanceof Lightable) {
 			sources.add((Lightable) geometry);
 			logger.info("Geometry recognized as Lightable has been added to the scene.");
-		} else if (geometry instanceof Unlightable) {
-			objects.add((Unlightable) geometry);
+		} else if (geometry instanceof Surface) {
+			objects.add((Surface) geometry);
 			logger.info("Geometry recognized as Unlightable has been added to the scene.");
 		} else {
 			logger.info("Geometry does not seem to have a specified type with Lightable or Unlightable");
@@ -43,21 +43,39 @@ public class Scene {
 		int depth = ray.getDepth();
 		if (depth > Config.MAX_DEPTH)
 			return;
+		Intersection intersection = nearestIntersection(ray);
+		if (intersection == null) {
+			ray.setIntensity(backgroud);
+			return;
+		}
+		Geometry geometry = intersection.getRelevant();
+		if (geometry instanceof Lightable) {
+			Lightable lightable = (Lightable) geometry;
+			ray.setIntensity(lightable.directIntensity());
+			return;
+		} else if (geometry instanceof Surface) {
+			Surface surface = (Surface) geometry;
+			Vector point = intersection.getPosition();
+			Vector normal = surface.normalAt(point);
+
+			doReflection(ray, point, normal);
+			doRefraction(ray, point, normal, surface);
+			computeIntensity(ray, point, normal, surface);
+		}
+	}
+
+	private Intersection nearestIntersection(@NotNull Ray ray) {
 		float nst = 0;
 		Geometry geom = null;
-		int geomType = 0;
-
 		for (Geometry source : sources) {
 			try {
-				float solution = source.intersection(ray);
+				float solution = source.intersection(ray.getOrigin(), ray.getDirection());
 				if (nst <= 0) {
 					nst = solution;
 					geom = source;
-					geomType = 1;
 				} else if (solution < nst) {
 					nst = solution;
 					geom = source;
-					geomType = 1;
 				}
 			} catch (NoSolutionException e) {
 			}
@@ -66,42 +84,22 @@ public class Scene {
 		for (Geometry object : objects) {
 			float solution = 0;
 			try {
-				solution = object.intersection(ray);
+				solution = object.intersection(ray.getOrigin(), ray.getDirection());
 				if (nst <= 0) {
 					nst = solution;
 					geom = object;
-					geomType = 2;
 				} else if (solution < nst) {
 					nst = solution;
 					geom = object;
-					geomType = 2;
 				}
 			} catch (NoSolutionException e) {
 			}
 
 		}
-		if (geomType == 0) {
-			ray.setIntensity(backgroud);
-			return;
-		}
-		if (geomType == 1) {
-			Lightable lightable = (Lightable) geom;
-			ray.setIntensity(lightable.directIntensity());
-			return;
-		}
-		if (geomType != 2) {
-			return;
-		}
-		Unlightable unlightable = (Unlightable) geom;
-		// point = p0 + x*u
-		Vector u = ray.getDirection();
-		Vector p0 = ray.getOrigin();
-		Vector point = p0.plus(u.mul(nst));
-		Vector normal = unlightable.normalAt(point);
 
-		doReflection(ray, point, normal);
-		doRefraction(ray, point, normal, unlightable);
-		computeIntensity(ray, point, normal, unlightable);
+		if (geom == null)
+			return null;
+		return new Intersection(ray.getOrigin().plus(ray.getDirection().mul(nst)), geom);
 	}
 
 	private void doReflection(Ray ray, Vector point, Vector normal) {
@@ -113,9 +111,9 @@ public class Scene {
 		}
 	}
 
-	private void doRefraction(Ray ray, Vector point, Vector normal, Unlightable unlightable) {
-		if (unlightable.isTransparentAt(point)) {
-			Ray t = ray.refractedBy(point, normal, unlightable.indexAt(point));
+	private void doRefraction(Ray ray, Vector point, Vector normal, Surface surface) {
+		if (surface.isTransparentAt(point)) {
+			Ray t = ray.refractedBy(point, normal, surface.refractionIndexAt(point));
 			if (t != null) {
 				t.setDepth(ray.getDepth() + 1);
 				trace(t);
@@ -124,14 +122,43 @@ public class Scene {
 		}
 	}
 
-	private void computeIntensity(Ray ray, Vector point, Vector normal, Unlightable unlightable) {
-		Intensity base = unlightable.intensityAt(point);
+	private void computeIntensity(Ray ray, Vector point, Vector normal, Surface surface) {
+		Intensity base = surface.intensityAt(point);
+		Intensity i = new Intensity();
 		for (Lightable source : sources) {
-			Intensity intensity = source.reflecIntensity(ray.getDirection(), point, normal,
-					unlightable.reflectPolicyAt(point));
-			base = base.mul(intensity);
+			Intensity intensity = source.reflecIntensity(ray.getDirection(), point, normal, surface);
+			if (intensity != null)
+				i = i.plus(intensity);
 		}
-		ray.setIntensity(base);
+		ray.setIntensity(base.mul(i));
+	}
+
+	public static class Intersection {
+
+		private Vector position;
+		private Geometry relevant;
+
+		public Intersection(@NotNull Vector position, @NotNull Geometry relevant) {
+			this.position = position;
+			this.relevant = relevant;
+		}
+
+		public Vector getPosition() {
+			return position;
+		}
+
+		public void setPosition(Vector position) {
+			this.position = position;
+		}
+
+		public Geometry getRelevant() {
+			return relevant;
+		}
+
+		public void setRelevant(Geometry relevant) {
+			this.relevant = relevant;
+		}
+
 	}
 
 }

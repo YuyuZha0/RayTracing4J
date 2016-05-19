@@ -29,12 +29,11 @@ public class App {
 
 		Scene scene = new Scene();
 		Sphere sphere = new Sphere(new Vector(w / 2, h / 2, 0), 100);
-		DotLight dotLight = new DotLight(new Vector(0, 0, -600), new Intensity(1, 1, 1));
-
-		scene.add(sphere).add(dotLight);
-		sphere.setIndex(2);
-
-		Vector viewPoint = new Vector(w / 2, h / 2, -600);
+		sphere.smoothIndex(1.5f).diffuseIndex(1).mirrorIndex(0);
+		DotLight dotLight1 = new DotLight(new Vector(w/2, h/2, -600), new Intensity(1, 1, 1));
+		DotLight dotLight2 = new DotLight(new Vector(500, 0, -600), new Intensity(1, 1, 1));
+		scene.add(sphere).add(dotLight1);
+		Vector viewPoint = new Vector(w / 2, h / 2, -1000);
 		pixels.forEach(pixel -> {
 			Ray ray = pixel.ray(viewPoint);
 			scene.trace(ray);

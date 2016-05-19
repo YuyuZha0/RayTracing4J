@@ -10,7 +10,7 @@ public interface Geometry {
 	 * @param ray
 	 * @return
 	 */
-	float intersection(@NotNull Ray ray) throws NoSolutionException;
+	float intersection(@NotNull Vector p0, @NotNull Vector u) throws NoSolutionException;
 
 	static class NoSolutionException extends Exception {
 

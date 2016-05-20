@@ -1,8 +1,8 @@
 package com.bankwel.j3d.raytracing.core;
 
-import java.awt.Color;
-
 import javax.validation.constraints.NotNull;
+
+import com.bankwel.j3d.raytracing.core.model.Source.Intensity;
 
 public class Ray {
 
@@ -113,72 +113,11 @@ public class Ray {
 	public Intensity countIntensity() {
 		Intensity itn = intensity;
 		if (secondaryRef != null)
-			itn = itn.plus(secondaryRef.countIntensity());
+			itn = itn.join(secondaryRef.countIntensity());
 		if (secondaryTrans != null)
-			itn = itn.plus(secondaryTrans.countIntensity());
+			itn = itn.join(secondaryTrans.countIntensity());
 		return itn;
 	}
 
-	public static class Intensity {
-
-		private float ir;
-		private float ig;
-		private float ib;
-
-		public Intensity() {
-			ir = 0;
-			ig = 0;
-			ib = 0;
-		}
-
-		public Intensity(float ir, float ig, float ib) {
-			ir = limit(ir);
-			ig = limit(ir);
-			ib = limit(ir);
-
-			this.ir = ir;
-			this.ig = ig;
-			this.ib = ib;
-		}
-
-		private float limit(float f) {
-			return Math.min(1, Math.abs(f));
-		}
-
-		public float getIr() {
-			return ir;
-		}
-
-		public float getIg() {
-			return ig;
-		}
-
-		public float getIb() {
-			return ib;
-		}
-
-		public Intensity plus(Intensity i) {
-			return new Intensity(ir + i.getIr(), ig + i.getIg(), ib + i.getIb());
-		}
-
-		public Intensity mul(Intensity i) {
-			return new Intensity(ir * i.getIr(), ig * i.getIg(), ib * i.getIb());
-		}
-
-		public Intensity mul(float k) {
-			return new Intensity(k * ir, k * ig, k * ib);
-		}
-
-		public Intensity decline(@NotNull Vector vec) {
-			float n = vec.normal();
-			float k = 1 / (1 + n + n * n);
-			return mul(k);
-		}
-
-		public Color toColor() {
-
-			return new Color(ir, ig, ib);
-		}
-
-	}
+	
 }

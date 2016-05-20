@@ -5,14 +5,13 @@ import java.awt.image.BufferedImage;
 
 import javax.validation.constraints.NotNull;
 
+import com.bankwel.j3d.raytracing.core.model.Source.Intensity;
+
 public class Pixel {
 
 	private int x;
 	private int y;
-	private int rgb;
-
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(Pixel.class);
+	private Intensity intensity;
 
 	public Pixel(int x, int y) {
 		this.x = x;
@@ -41,16 +40,16 @@ public class Pixel {
 		this.y = y;
 	}
 
-	public int getRgb() {
-		return rgb;
+	public Intensity getIntensity() {
+		return intensity;
 	}
 
-	public void setRgb(int rgb) {
-		this.rgb = rgb;
+	public void setIntensity(Intensity intensity) {
+		this.intensity = intensity;
 	}
 
 	public void render(@NotNull BufferedImage image) {
-		image.setRGB(x, y, rgb);
+		image.setRGB(x, y, intensity.toColor().getRGB());
 	}
 
 	public String toString() {
@@ -60,7 +59,7 @@ public class Pixel {
 		buffer.append(',');
 		buffer.append(y);
 		buffer.append(':');
-		buffer.append(rgb);
+		buffer.append(intensity);
 		buffer.append(')');
 		return buffer.toString();
 	}

@@ -6,10 +6,11 @@ import java.util.List;
 
 import com.bankwel.j3d.raytracing.core.Pixel;
 import com.bankwel.j3d.raytracing.core.Ray;
-import com.bankwel.j3d.raytracing.core.Ray.Intensity;
 import com.bankwel.j3d.raytracing.core.Scene;
 import com.bankwel.j3d.raytracing.core.Vector;
-import com.bankwel.j3d.raytracing.geometrys.DotLight;
+import com.bankwel.j3d.raytracing.core.model.Source.Intensity;
+import com.bankwel.j3d.raytracing.geometrys.DotSource;
+import com.bankwel.j3d.raytracing.geometrys.Plain;
 import com.bankwel.j3d.raytracing.geometrys.Sphere;
 import com.bankwel.j3d.raytracing.plugins.UI;
 
@@ -28,16 +29,20 @@ public class App {
 		}
 
 		Scene scene = new Scene();
-		Sphere sphere = new Sphere(new Vector(w / 2, h / 2, 0), 100);
-		sphere.smoothIndex(1.5f).diffuseIndex(1).mirrorIndex(0);
-		DotLight dotLight1 = new DotLight(new Vector(w/2, h/2, -600), new Intensity(1, 1, 1));
-		DotLight dotLight2 = new DotLight(new Vector(500, 0, -600), new Intensity(1, 1, 1));
-		scene.add(sphere).add(dotLight1);
+		Sphere sphere1 = new Sphere(new Vector(150, 100, 0), 100);
+		Sphere sphere2 = new Sphere(new Vector(200, 300, 100), 70);
+		Plain plain = new Plain(new Vector(w / 2, h / 2, 500), new Vector(-1, -1, -1));
+		sphere1.illuminationIndex(1, 1, 1).color(0, 1, 0);
+		sphere2.illuminationIndex(1, 10, 8).color(1, 1, 0);
+		plain.illuminationIndex(1, 1, 1);
+		DotSource dotLight1 = new DotSource(new Vector(0, 0, -600), new Intensity(0.5f, 0.5f, 0.5f));
+		DotSource dotLight2 = new DotSource(new Vector(500, 0, -600), new Intensity(0.1f, 0.1f, 0.8f));
+		scene.add(sphere1).add(sphere2).add(dotLight1);
 		Vector viewPoint = new Vector(w / 2, h / 2, -1000);
 		pixels.forEach(pixel -> {
 			Ray ray = pixel.ray(viewPoint);
 			scene.trace(ray);
-			pixel.setRgb(ray.getIntensity().toColor().getRGB());
+			pixel.setIntensity(ray.countIntensity());
 		});
 
 		pixels.forEach(pixel -> {

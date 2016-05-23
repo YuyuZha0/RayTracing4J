@@ -1,10 +1,14 @@
 package com.bankwel.j3d.raytracing.geometrys;
 
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 
 import com.bankwel.j3d.raytracing.core.Vector;
 import com.bankwel.j3d.raytracing.core.model.Source;
 import com.bankwel.j3d.raytracing.core.model.Surface;
+import com.bankwel.j3d.raytracing.core.model.VisibleSurface;
+import com.bankwel.j3d.raytracing.core.model.VisibleSurface.NoIntersectionException;
 import com.bankwel.j3d.raytracing.core.model.Surface.IlluminationIndex;
 
 public class DotSource implements Source {
@@ -18,6 +22,20 @@ public class DotSource implements Source {
 	}
 
 	@Override
+	public boolean isInShadow(Vector point, List<VisibleSurface> surfaces) {
+		Vector u = position.sub(point).normalize();
+		for (VisibleSurface surface : surfaces) {
+			try {
+				float solution = surface.intersection(point, u);
+				if (solution > 0)
+					return true;
+			} catch (NoIntersectionException e) {
+			}
+		}
+		return false;
+	}
+
+	@Override
 	public Intensity intensityAt(Vector u, Vector point, Vector normal, Surface surface) {
 		Vector L = position.sub(point);
 		Vector l = L.normalize();
@@ -27,7 +45,7 @@ public class DotSource implements Source {
 		kd *= normal.dot(l);
 		Vector h = l.sub(u).normalize();
 		ks *= (float) Math.pow(normal.dot(h), ii.getHighlight());
-		return intensity.multiply(kd + ks);
+		return intensity.multiply(kd + ks).decline(L);
 	}
 
 }

@@ -20,8 +20,6 @@ public class Plain extends MonotoneSurface {
 		if (delta == 0)
 			throw new NoIntersectionException();
 		float s = point.sub(p0).dot(normal) / delta;
-		//if (s <= 0)
-			//throw new NoIntersectionException();
 
 		return s;
 	}

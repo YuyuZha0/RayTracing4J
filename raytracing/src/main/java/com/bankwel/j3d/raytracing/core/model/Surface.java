@@ -28,7 +28,7 @@ public interface Surface extends Geometry {
 			diffuse = Math.abs(diffuse);
 			highlight = Math.abs(highlight);
 
-			float z = Math.max(specular, diffuse);
+			float z = specular + diffuse;
 			if (z == 0)
 				z = 1;
 			this.specular = specular / z;

@@ -113,11 +113,10 @@ public class Ray {
 	public Intensity countIntensity() {
 		Intensity itn = intensity;
 		if (secondaryRef != null)
-			itn = itn.join(secondaryRef.countIntensity());
+			itn = itn.join(secondaryRef.countIntensity().decline(secondaryRef.getOrigin().sub(origin)));
 		if (secondaryTrans != null)
-			itn = itn.join(secondaryTrans.countIntensity());
+			itn = itn.join(secondaryTrans.countIntensity().decline(secondaryTrans.getOrigin().sub(origin)));
 		return itn;
 	}
 
-	
 }

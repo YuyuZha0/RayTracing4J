@@ -32,12 +32,12 @@ public class App {
 		Sphere sphere1 = new Sphere(new Vector(150, 100, 0), 100);
 		Sphere sphere2 = new Sphere(new Vector(200, 300, 100), 70);
 		Plain plain = new Plain(new Vector(w / 2, h / 2, 500), new Vector(-1, -1, -1));
-		sphere1.illuminationIndex(1, 1, 1).color(0, 1, 0);
-		sphere2.illuminationIndex(1, 10, 8).color(1, 1, 0);
+		sphere1.illuminationIndex(1, 1, 1).color(1, 1, 1);
+		sphere2.illuminationIndex(1, 1, 8).color(1, 1, 1);
 		plain.illuminationIndex(1, 1, 1);
-		DotSource dotLight1 = new DotSource(new Vector(0, 0, -600), new Intensity(0.5f, 0.5f, 0.5f));
+		DotSource dotLight1 = new DotSource(new Vector(0, 0, -600), new Intensity(1, 1, 1));
 		DotSource dotLight2 = new DotSource(new Vector(500, 0, -600), new Intensity(0.1f, 0.1f, 0.8f));
-		scene.add(sphere1).add(sphere2).add(dotLight1);
+		scene.add(plain).add(dotLight1);
 		Vector viewPoint = new Vector(w / 2, h / 2, -1000);
 		pixels.forEach(pixel -> {
 			Ray ray = pixel.ray(viewPoint);

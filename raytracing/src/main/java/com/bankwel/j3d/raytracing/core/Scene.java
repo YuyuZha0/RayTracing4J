@@ -21,8 +21,6 @@ public class Scene {
 	private List<Source> sources = new ArrayList<Source>();
 	private List<VisibleSurface> surfaces = new ArrayList<VisibleSurface>();
 
-	private Intensity ambient = new Intensity();
-
 	private static final Logger logger = LoggerFactory.getLogger(Scene.class);
 
 	public Scene add(@NotNull Geometry geometry) {
@@ -38,25 +36,16 @@ public class Scene {
 		return this;
 	}
 
-	public Scene ambient(float red, float green, float blue) {
-		this.ambient = new Intensity(red, green, blue);
-		return this;
-	}
-
 	public void trace(@NotNull Ray ray) {
 		int depth = ray.getDepth();
 		if (depth > Config.MAX_DEPTH)
 			return;
 		Intersection intersection = closestIntersection(ray);
 		if (intersection == null) {
-			ray.setIntensity(ambient);
 			return;
 		}
 		VisibleSurface geometry = intersection.getRelevant();
-		if (geometry instanceof Source) {
-			ray.setIntensity(ambient);
-			return;
-		} else if (geometry instanceof VisibleSurface) {
+		if (geometry instanceof VisibleSurface) {
 			VisibleSurface surface = (VisibleSurface) geometry;
 			Vector point = intersection.getPosition();
 			Vector normal = surface.normalAt(point);
@@ -73,6 +62,8 @@ public class Scene {
 		for (VisibleSurface surface : surfaces) {
 			try {
 				float solution = surface.intersection(ray.getOrigin(), ray.getDirection());
+				if (solution <= 0)
+					continue;
 				if (distance <= 0) {
 					distance = solution;
 					geom = surface;
@@ -111,9 +102,10 @@ public class Scene {
 	}
 
 	private void computeIntensity(Ray ray, Vector point, Vector normal, Surface surface) {
-		Intensity intensity = ambient;
+		Intensity intensity = new Intensity();
 		for (Source source : sources) {
-			intensity = intensity.join(source.intensityAt(ray.getDirection(), point, normal, surface));
+			if (!source.isInShadow(point, surfaces))
+				intensity = intensity.join(source.intensityAt(ray.getDirection(), point, normal, surface));
 		}
 		ray.setIntensity(intensity.reduce(surface.colorIndexAt(point)));
 	}

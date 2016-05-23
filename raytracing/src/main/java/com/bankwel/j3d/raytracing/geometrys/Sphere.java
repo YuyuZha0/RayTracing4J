@@ -8,7 +8,7 @@ public class Sphere extends MonotoneSurface {
 
 	private Vector center;
 	private float radius;
-	private RefractionIndex refractionIndex = new RefractionIndex(1,2);
+	private RefractionIndex refractionIndex = new RefractionIndex();
 
 	public Sphere(@NotNull Vector center, @NotNull float radius) {
 		this.center = center;
@@ -26,13 +26,7 @@ public class Sphere extends MonotoneSurface {
 			throw new NoIntersectionException();
 		}
 		float sqrt = (float) Math.sqrt(delta);
-		float s = udp - sqrt;
-		if (s <= 0) {
-			s = udp + sqrt;
-		}
-		if (s <= 0)
-			throw new NoIntersectionException();
-		return s;
+		return udp - sqrt;
 	}
 
 	@Override

@@ -18,7 +18,8 @@ public class Plain extends MonotoneSurface {
 	@Override
 	public float[] allIntersections(Vector p0, Vector u) {
 		float delta = u.dot(normal);
-		if (delta == 0)
+		// 当光线方向和平面法线方向向量夹角小于等于90°的时候没有交点
+		if (delta >= 0)
 			return null;
 		float s = point.sub(p0).dot(normal) / delta;
 		return new float[] { s };

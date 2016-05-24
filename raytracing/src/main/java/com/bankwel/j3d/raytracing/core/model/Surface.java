@@ -6,6 +6,7 @@ import com.bankwel.j3d.raytracing.core.Ray;
 import com.bankwel.j3d.raytracing.core.Scene;
 import com.bankwel.j3d.raytracing.core.Vector;
 import com.bankwel.j3d.raytracing.core.model.Source.Intensity;
+import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 /**
  * 
@@ -60,6 +61,9 @@ public abstract class Surface implements Intersectable {
 
 	protected abstract RefractionIndex refractionIndexAt(@NotNull Vector point);
 
+	public static interface Index {
+	};
+
 	public static class IlluminationIndex implements Index {
 
 		private float specular;
@@ -67,9 +71,9 @@ public abstract class Surface implements Intersectable {
 		private float highlight;
 
 		public IlluminationIndex(float specular, float diffuse, float highlight) {
-			specular = Math.abs(specular);
-			diffuse = Math.abs(diffuse);
-			highlight = Math.abs(highlight);
+			specular = MathUtils.abs(specular);
+			diffuse = MathUtils.abs(diffuse);
+			highlight = MathUtils.abs(highlight);
 
 			float z = specular + diffuse;
 			if (z == 0)
@@ -125,11 +129,10 @@ public abstract class Surface implements Intersectable {
 		}
 
 		public ColorIndex(float red, float green, float blue) {
-			red = Math.abs(red);
-			green = Math.abs(green);
-			blue = Math.abs(blue);
-			float max = Math.max(red, Math.max(green, blue));
-			max = Math.max(max, 1);
+			red = MathUtils.abs(red);
+			green = MathUtils.abs(green);
+			blue = MathUtils.abs(blue);
+			float max = MathUtils.max(red, green, blue, 1);
 			this.red = red / max;
 			this.green = green / max;
 			this.blue = blue / max;

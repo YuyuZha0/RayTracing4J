@@ -50,7 +50,6 @@ public class Scene {
 				intersectable = surface;
 			}
 		}
-
 		if (intersectable == null)
 			return null;
 		return new Intersection(origin.plus(direction.mul(distance)), intersectable);

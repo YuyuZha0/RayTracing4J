@@ -10,12 +10,12 @@ import com.bankwel.j3d.raytracing.core.model.Source;
 import com.bankwel.j3d.raytracing.core.model.Surface.IlluminationIndex;
 import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
-public class DotSource implements Source {
+public class PointSource implements Source {
 
 	private Vector position;
 	private Intensity intensity;
 
-	public DotSource(@NotNull Vector position, @NotNull Intensity intensity) {
+	public PointSource(@NotNull Vector position, @NotNull Intensity intensity) {
 		this.position = position;
 		this.intensity = intensity;
 	}

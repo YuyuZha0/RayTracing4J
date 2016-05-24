@@ -1,5 +1,7 @@
 package com.bankwel.j3d.raytracing.core;
 
+import com.bankwel.j3d.raytracing.plugins.MathUtils;
+
 /**
  * 
  * @author yuyuzhao
@@ -48,12 +50,12 @@ public class Vector {
 		return new Vector(this.y * v.z - this.z * v.y, this.z * v.x - this.x * v.z, this.y * v.z - this.z * v.y);
 	}
 
-	public float normal() {
-		return (float) Math.sqrt(x * x + y * y + z * z);
+	public float length() {
+		return MathUtils.sqrt(x * x + y * y + z * z);
 	}
 
 	public Vector normalize() {
-		float n = normal();
+		float n = length();
 		return new Vector(x / n, y / n, z / n);
 	}
 

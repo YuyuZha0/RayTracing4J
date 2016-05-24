@@ -1,9 +1,8 @@
-package com.bankwel.j3d.raytracing.geometrys;
+package com.bankwel.j3d.raytracing.core.model;
 
 import com.bankwel.j3d.raytracing.core.Vector;
-import com.bankwel.j3d.raytracing.core.model.VisibleSurface;
 
-public abstract class MonotoneSurface implements VisibleSurface {
+public abstract class MonotoneSurface extends Surface {
 
 	private ColorIndex colorIndex = new ColorIndex();
 	private IlluminationIndex illuminationIndex = new IlluminationIndex(1, 1, 1);
@@ -13,17 +12,19 @@ public abstract class MonotoneSurface implements VisibleSurface {
 		return this;
 	}
 
-	public MonotoneSurface illuminationIndex(float specular, float diffuse, float highlight) {
+	public MonotoneSurface illumination(float specular, float diffuse, float highlight) {
+		this.illuminationIndex = new IlluminationIndex(specular, diffuse, highlight);
 		return this;
 	}
 
 	@Override
-	public IlluminationIndex illuminationIndexAt(Vector point) {
+	protected IlluminationIndex illuminationIndexAt(Vector point) {
 		return illuminationIndex;
 	}
 
 	@Override
-	public ColorIndex colorIndexAt(Vector point) {
+	protected ColorIndex colorIndexAt(Vector point) {
 		return colorIndex;
 	}
+
 }

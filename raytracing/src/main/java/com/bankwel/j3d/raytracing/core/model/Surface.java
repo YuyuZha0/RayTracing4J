@@ -2,22 +2,65 @@ package com.bankwel.j3d.raytracing.core.model;
 
 import javax.validation.constraints.NotNull;
 
+import com.bankwel.j3d.raytracing.core.Ray;
+import com.bankwel.j3d.raytracing.core.Scene;
 import com.bankwel.j3d.raytracing.core.Vector;
+import com.bankwel.j3d.raytracing.core.model.Source.Intensity;
 
 /**
  * 
  * @author yuyuzhao
  *
  */
-public interface Surface extends Geometry {
+public abstract class Surface implements Intersectable {
 
-	IlluminationIndex illuminationIndexAt(@NotNull Vector point);
+	@Override
+	public void onIntersecting(Ray ray, Scene scene, Vector point) {
+		Vector normal = normalAt(point);
+		reflect(ray, scene, point, normal);
+		refract(ray, scene, point, normal);
+		computeIntensity(ray, scene, point, normal);
+	}
 
-	ColorIndex colorIndexAt(@NotNull Vector point);
+	private void reflect(Ray ray, Scene scene, Vector point, Vector normal) {
+		Ray r = ray.reflectedBy(point, normal);
+		if (r != null) {
+			r.setDepth(ray.getDepth() + 1);
+			r.trace(scene);
+			ray.setSecondaryRef(r);
+		}
+	}
 
-	RefractionIndex refractionIndexAt(@NotNull Vector point);
+	private void refract(Ray ray, Scene scene, Vector point, Vector normal) {
+		RefractionIndex ri = refractionIndexAt(point);
+		if (!ri.isTransparent())
+			return;
+		Ray t = ray.refractedBy(point, normal, ri.getBack() / ri.getFront());
+		if (t != null) {
+			t.setDepth(ray.getDepth() + 1);
+			t.trace(scene);
+			ray.setSecondaryTrans(t);
+		}
+	}
 
-	static class IlluminationIndex implements Index {
+	private void computeIntensity(Ray ray, Scene scene, Vector point, Vector normal) {
+		Intensity intensity = new Intensity();
+		for (Source source : scene.getSources()) {
+			intensity = intensity.join(source.intensityAt(ray.getDirection(), point, normal, illuminationIndexAt(point),
+					scene.getSurfaces()));
+		}
+		ray.setIntensity(intensity.reduce(colorIndexAt(point)));
+	}
+
+	protected abstract Vector normalAt(@NotNull Vector point);
+
+	protected abstract IlluminationIndex illuminationIndexAt(@NotNull Vector point);
+
+	protected abstract ColorIndex colorIndexAt(@NotNull Vector point);
+
+	protected abstract RefractionIndex refractionIndexAt(@NotNull Vector point);
+
+	public static class IlluminationIndex implements Index {
 
 		private float specular;
 		private float diffuse;
@@ -69,7 +112,7 @@ public interface Surface extends Geometry {
 	 * @author yuyuhzhao
 	 *
 	 */
-	static class ColorIndex implements Index {
+	public static class ColorIndex implements Index {
 
 		private float red;
 		private float green;
@@ -118,7 +161,7 @@ public interface Surface extends Geometry {
 
 	}
 
-	static class RefractionIndex implements Index {
+	public static class RefractionIndex implements Index {
 
 		private boolean transparent;
 		private float front;

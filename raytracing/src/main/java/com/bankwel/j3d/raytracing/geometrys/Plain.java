@@ -3,6 +3,7 @@ package com.bankwel.j3d.raytracing.geometrys;
 import javax.validation.constraints.NotNull;
 
 import com.bankwel.j3d.raytracing.core.Vector;
+import com.bankwel.j3d.raytracing.core.model.MonotoneSurface;
 
 public class Plain extends MonotoneSurface {
 
@@ -15,13 +16,12 @@ public class Plain extends MonotoneSurface {
 	}
 
 	@Override
-	public float intersection(Vector p0, Vector u) throws NoIntersectionException {
+	public float[] allIntersections(Vector p0, Vector u) {
 		float delta = u.dot(normal);
 		if (delta == 0)
-			throw new NoIntersectionException();
+			return null;
 		float s = point.sub(p0).dot(normal) / delta;
-
-		return s;
+		return new float[] { s };
 	}
 
 	@Override
@@ -32,6 +32,10 @@ public class Plain extends MonotoneSurface {
 	@Override
 	public RefractionIndex refractionIndexAt(Vector point) {
 		return new RefractionIndex();
+	}
+
+	public static void main(String[] args) {
+		System.out.println(1e-5f == 0f);
 	}
 
 }

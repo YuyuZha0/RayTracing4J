@@ -5,15 +5,15 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import com.bankwel.j3d.raytracing.core.Config;
+import com.bankwel.j3d.raytracing.core.Constant;
 import com.bankwel.j3d.raytracing.core.Vector;
 import com.bankwel.j3d.raytracing.core.model.Surface.ColorIndex;
+import com.bankwel.j3d.raytracing.core.model.Surface.IlluminationIndex;
 
 public interface Source extends Geometry {
 
-	boolean isInShadow(@NotNull Vector point, @NotNull List<VisibleSurface> surfaces);
-
-	Intensity intensityAt(@NotNull Vector u, @NotNull Vector point, @NotNull Vector normal, @NotNull Surface Surface);
+	Intensity intensityAt(@NotNull Vector u, @NotNull Vector point, @NotNull Vector normal,
+			@NotNull IlluminationIndex illuminationIndex, @NotNull List<Intersectable> shelters);
 
 	public static class Intensity {
 
@@ -41,8 +41,8 @@ public interface Source extends Geometry {
 		}
 
 		public Intensity decline(@NotNull Vector vec) {
-			float d = vec.normal();
-			float f = new Vector(d * d, d, 1).dot(Config.RAY_DECLINE_FACTOR);
+			float d = vec.length();
+			float f = new Vector(d * d, d, 1).dot(Constant.RAY_DECLINE_FACTOR);
 			if (f == 0)
 				throw new ArithmeticException();
 			return new Intensity(red / f, green / f, blue / f);

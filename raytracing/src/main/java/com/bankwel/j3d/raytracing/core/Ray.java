@@ -2,6 +2,7 @@ package com.bankwel.j3d.raytracing.core;
 
 import javax.validation.constraints.NotNull;
 
+import com.bankwel.j3d.raytracing.core.Scene.Intersection;
 import com.bankwel.j3d.raytracing.core.model.Source.Intensity;
 
 public class Ray {
@@ -117,6 +118,16 @@ public class Ray {
 		if (secondaryTrans != null)
 			itn = itn.join(secondaryTrans.countIntensity().decline(secondaryTrans.getOrigin().sub(origin)));
 		return itn;
+	}
+
+	public Ray trace(@NotNull Scene scene) {
+		if (depth > Constant.MAX_DEPTH)
+			return this;
+		Intersection intersection = scene.closestIntersection(origin, direction);
+		if (intersection == null)
+			return this;
+		intersection.getRelevant().onIntersecting(this, scene, intersection.getPosition());
+		return this;
 	}
 
 }

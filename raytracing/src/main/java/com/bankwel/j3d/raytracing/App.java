@@ -12,7 +12,7 @@ import com.bankwel.j3d.raytracing.model.Pixel;
 import com.bankwel.j3d.raytracing.model.Ray;
 import com.bankwel.j3d.raytracing.model.Scene;
 import com.bankwel.j3d.raytracing.model.Vector;
-import com.bankwel.j3d.raytracing.plugins.UI;
+import com.bankwel.j3d.raytracing.plugins.Serializer;
 
 public class App {
 
@@ -56,6 +56,7 @@ public class App {
 			pixel.render(image);
 		});
 
-		UI.display(image);
+		// UI.display(image);
+		Serializer.save(image, "D:\\raytracing", "png");
 	}
 }

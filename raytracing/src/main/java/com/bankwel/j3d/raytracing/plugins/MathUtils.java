@@ -1,8 +1,14 @@
 package com.bankwel.j3d.raytracing.plugins;
 
-public class MathUtils {
+import com.bankwel.j3d.raytracing.core.Constant;
 
-	private static final float ZERO_APPRO = 1e-2f;
+/**
+ * 
+ * @author yuyuzhao
+ * @since 2016-5-24
+ *
+ */
+public class MathUtils {
 
 	public static float max(float... args) {
 		float max = args[0];
@@ -31,14 +37,14 @@ public class MathUtils {
 	}
 
 	public static boolean equalsZero(float f) {
-		return f > -ZERO_APPRO && f < ZERO_APPRO;
+		return f > -Constant.ZERO_APPROX && f < Constant.ZERO_APPROX;
 	}
 
 	public static boolean greaterThanZero(float f) {
-		return f > ZERO_APPRO;
+		return f >= Constant.ZERO_APPROX;
 	}
 
 	public static boolean lessThanZero(float f) {
-		return f < -ZERO_APPRO;
+		return f <= -Constant.ZERO_APPROX;
 	}
 }

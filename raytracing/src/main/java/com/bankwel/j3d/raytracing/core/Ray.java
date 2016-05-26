@@ -9,9 +9,9 @@ public class Ray {
 
 	private Vector origin;
 	private Vector direction;
-	private int depth = 0;
+	private int depth = 1;
 
-	private Ray secondaryRef = null;
+	private Ray secondaryRefl = null;
 	private Ray secondaryTrans = null;
 
 	private Intensity intensity = new Intensity();
@@ -53,12 +53,12 @@ public class Ray {
 		this.intensity = intensity;
 	}
 
-	public Ray getSecondaryRef() {
-		return secondaryRef;
+	public Ray getSecondaryRefl() {
+		return secondaryRefl;
 	}
 
-	public void setSecondaryRef(Ray secondaryRef) {
-		this.secondaryRef = secondaryRef;
+	public void setSecondaryRefl(Ray secondaryRefl) {
+		this.secondaryRefl = secondaryRefl;
 	}
 
 	public Ray getSecondaryTrans() {
@@ -112,11 +112,12 @@ public class Ray {
 	}
 
 	public Intensity countIntensity() {
-		Intensity itn = intensity;
-		if (secondaryRef != null)
-			itn = itn.join(secondaryRef.countIntensity().decline(secondaryRef.getOrigin().sub(origin)));
+		Intensity itn = new Intensity();
+		itn.join(intensity);
+		if (secondaryRefl != null)
+			itn.join(secondaryRefl.countIntensity().decline(secondaryRefl.getOrigin().sub(origin)));
 		if (secondaryTrans != null)
-			itn = itn.join(secondaryTrans.countIntensity().decline(secondaryTrans.getOrigin().sub(origin)));
+			itn.join(secondaryTrans.countIntensity().decline(secondaryTrans.getOrigin().sub(origin)));
 		return itn;
 	}
 

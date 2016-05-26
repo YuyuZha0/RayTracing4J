@@ -10,7 +10,6 @@ public class Sphere extends MonotoneSurface {
 
 	private Vector center;
 	private float radius;
-	private RefractionIndex refractionIndex = new RefractionIndex();
 
 	public Sphere(@NotNull Vector center, @NotNull float radius) {
 		this.center = center;
@@ -36,10 +35,4 @@ public class Sphere extends MonotoneSurface {
 	protected Vector normalAt(Vector point) {
 		return point.sub(center).normalize();
 	}
-
-	@Override
-	protected RefractionIndex refractionIndexAt(Vector point) {
-		return refractionIndex;
-	}
-
 }

@@ -25,7 +25,7 @@ public class App {
 		int h = image.getHeight();
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < h; j++) {
-				pixels.add(new Pixel(i, j));
+				pixels.add(new Pixel(i, j, 3));
 			}
 		}
 
@@ -33,17 +33,22 @@ public class App {
 		Sphere sphere1 = new Sphere(new Vector(150, 100, 100), 90);
 		Sphere sphere2 = new Sphere(new Vector(200, 200, 100), 70);
 		Plain plain = new Plain(new Vector(w / 2, h / 2, 500), new Vector(0, -10, -1));
-		sphere1.illumination(1, 9, 1.4f).color(0.5f, 0.8f, 0.6f);
-		sphere2.illumination(1, 1, 8).color(1, 1, 1);
-		plain.illumination(7, 1, 0.4f).color(0.7f, 0.4f, 0.9f);
+		sphere1.illumination(1, 3, 1.4f).reflection(0.01f, 0.01f, 0.02f).refraction(1.9f);
+		sphere2.illumination(1, 1, 8).reflection(0.5f, 0.6f, 0.2f);
+		plain.illumination(1, 1, 1).reflection(0.4f, 0.4f, 0.4f);
+
 		PointSource dot1 = new PointSource(new Vector(0, 0, -900), new Intensity(0.7f, 0.7f, 0.7f));
 		PointSource dot2 = new PointSource(new Vector(500, 0, -600), new Intensity(0.3f, 0.4f, 0.8f));
-		AmbientSource ambient = new AmbientSource(new Intensity(0.1f, 0.1f, 0.1f));
-		scene.add(sphere1).add(sphere2).add(dot1).add(ambient).add(plain);
+		AmbientSource ambient = new AmbientSource(new Intensity(0.2f, 0.2f, 0.2f));
+		scene.add(sphere1).add(sphere2).add(dot1).add(ambient).add(plain).add(dot2);
 		Vector viewPoint = new Vector(w / 2, h / 2, -1000);
 		pixels.forEach(pixel -> {
-			Ray ray = pixel.ray(viewPoint).trace(scene);
-			pixel.setIntensity(ray.countIntensity());
+			Intensity intensity = new Intensity();
+			List<Ray> rays = pixel.ray(viewPoint);
+			rays.forEach(ray -> {
+				intensity.join(ray.trace(scene).countIntensity());
+			});
+			pixel.setIntensity(intensity.multiply(1f / rays.size()));
 		});
 
 		pixels.forEach(pixel -> {

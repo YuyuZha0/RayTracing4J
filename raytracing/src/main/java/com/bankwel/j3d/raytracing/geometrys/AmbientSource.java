@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import com.bankwel.j3d.raytracing.core.Vector;
 import com.bankwel.j3d.raytracing.core.model.Intersectable;
 import com.bankwel.j3d.raytracing.core.model.Source;
-import com.bankwel.j3d.raytracing.core.model.Surface.IlluminationIndex;
+import com.bankwel.j3d.raytracing.core.model.Surface.IllumIndex;
 
 public class AmbientSource implements Source {
 
@@ -18,7 +18,7 @@ public class AmbientSource implements Source {
 	}
 
 	@Override
-	public Intensity intensityAt(Vector u, Vector point, Vector normal, IlluminationIndex illuminationIndex,
+	public Intensity intensityAt(Vector u, Vector point, Vector normal, IllumIndex illuminationIndex,
 			List<Intersectable> shelters) {
 		return intensity;
 	}

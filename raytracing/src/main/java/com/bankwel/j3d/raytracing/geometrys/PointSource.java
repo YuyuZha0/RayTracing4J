@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import com.bankwel.j3d.raytracing.core.Vector;
 import com.bankwel.j3d.raytracing.core.model.Intersectable;
 import com.bankwel.j3d.raytracing.core.model.Source;
-import com.bankwel.j3d.raytracing.core.model.Surface.IlluminationIndex;
+import com.bankwel.j3d.raytracing.core.model.Surface.IllumIndex;
 import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 public class PointSource implements Source {
@@ -21,7 +21,7 @@ public class PointSource implements Source {
 	}
 
 	@Override
-	public Intensity intensityAt(Vector u, Vector point, Vector normal, IlluminationIndex ii,
+	public Intensity intensityAt(Vector u, Vector point, Vector normal, IllumIndex ii,
 			List<Intersectable> shelters) {
 		Vector L = position.sub(point);
 		Vector l = L.normalize();
@@ -41,7 +41,7 @@ public class PointSource implements Source {
 			if (fs == null)
 				continue;
 			for (int i = 0; i < fs.length; i++)
-				// 此处应该为0 但是由于浮点运算的精度限制因此会出现噪点
+				// 此处应该为0 但是由于浮点运算的精度限制因此会出现噪点,如果在阴影中，那么光源和交点之间的连线和其它物体相交
 				if (MathUtils.greaterThanZero(fs[i]) && fs[i] < max) {
 					return true;
 				}

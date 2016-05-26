@@ -4,27 +4,40 @@ import com.bankwel.j3d.raytracing.core.Vector;
 
 public abstract class MonotoneSurface extends Surface {
 
-	private ColorIndex colorIndex = new ColorIndex();
-	private IlluminationIndex illuminationIndex = new IlluminationIndex(1, 1, 1);
+	private IntensityIndex intensityIndex = new IntensityIndex();
+	private IllumIndex illuminationIndex = new IllumIndex(1, 1, 1);
+	private float refractIndex = 0;
 
-	public MonotoneSurface color(float red, float green, float blue) {
-		colorIndex = new ColorIndex(red, green, blue);
+	public MonotoneSurface reflection(float red, float green, float blue) {
+		intensityIndex = new IntensityIndex(red, green, blue);
 		return this;
 	}
 
 	public MonotoneSurface illumination(float specular, float diffuse, float highlight) {
-		this.illuminationIndex = new IlluminationIndex(specular, diffuse, highlight);
+		this.illuminationIndex = new IllumIndex(specular, diffuse, highlight);
+		return this;
+	}
+
+	public MonotoneSurface refraction(float index) {
+		this.refractIndex = index;
 		return this;
 	}
 
 	@Override
-	protected IlluminationIndex illuminationIndexAt(Vector point) {
+	protected IllumIndex illuminationIndexAt(Vector point) {
 		return illuminationIndex;
 	}
 
 	@Override
-	protected ColorIndex colorIndexAt(Vector point) {
-		return colorIndex;
+	protected IntensityIndex reflIndexAt(Vector point) {
+		return intensityIndex;
+	}
+
+	@Override
+	protected float refrIndexAt(Vector point, boolean outside) {
+		if (refractIndex <= 0)
+			return 0;
+		return outside ? refractIndex : 1 / refractIndex;
 	}
 
 }

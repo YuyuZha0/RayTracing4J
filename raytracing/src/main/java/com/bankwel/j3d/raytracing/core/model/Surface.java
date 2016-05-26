@@ -16,7 +16,7 @@ import com.bankwel.j3d.raytracing.plugins.MathUtils;
 public abstract class Surface implements Intersectable {
 
 	@Override
-	public void onIntersecting(Ray ray, Scene scene, Vector point) {
+	public final void onIntersecting(Ray ray, Scene scene, Vector point) {
 		Vector normal = normalAt(point);
 		reflect(ray, scene, point, normal);
 		refract(ray, scene, point, normal);
@@ -28,18 +28,20 @@ public abstract class Surface implements Intersectable {
 		if (r != null) {
 			r.setDepth(ray.getDepth() + 1);
 			r.trace(scene);
-			ray.setSecondaryRef(r);
+			reduceIntensity(r, reflIndexAt(point));
+			ray.setSecondaryRefl(r);
 		}
 	}
 
 	private void refract(Ray ray, Scene scene, Vector point, Vector normal) {
-		RefractionIndex ri = refractionIndexAt(point);
-		if (!ri.isTransparent())
+		float index = refrIndexAt(point, ray.getDirection().dot(normal) < 0);
+		if (index <= 0)
 			return;
-		Ray t = ray.refractedBy(point, normal, ri.getBack() / ri.getFront());
+		Ray t = ray.refractedBy(point, normal, index);
 		if (t != null) {
 			t.setDepth(ray.getDepth() + 1);
 			t.trace(scene);
+			reduceIntensity(t, reflIndexAt(point).complement());
 			ray.setSecondaryTrans(t);
 		}
 	}
@@ -47,30 +49,35 @@ public abstract class Surface implements Intersectable {
 	private void computeIntensity(Ray ray, Scene scene, Vector point, Vector normal) {
 		Intensity intensity = new Intensity();
 		for (Source source : scene.getSources()) {
-			intensity = intensity.join(source.intensityAt(ray.getDirection(), point, normal, illuminationIndexAt(point),
+			intensity.join(source.intensityAt(ray.getDirection(), point, normal, illuminationIndexAt(point),
 					scene.getSurfaces()));
 		}
-		ray.setIntensity(intensity.reduce(colorIndexAt(point)));
+		ray.setIntensity(intensity);
+		reduceIntensity(ray, reflIndexAt(point));
+	}
+
+	private void reduceIntensity(Ray ray, IntensityIndex index) {
+		ray.getIntensity().reduce(index);
 	}
 
 	protected abstract Vector normalAt(@NotNull Vector point);
 
-	protected abstract IlluminationIndex illuminationIndexAt(@NotNull Vector point);
+	protected abstract IllumIndex illuminationIndexAt(@NotNull Vector point);
 
-	protected abstract ColorIndex colorIndexAt(@NotNull Vector point);
+	protected abstract IntensityIndex reflIndexAt(@NotNull Vector point);
 
-	protected abstract RefractionIndex refractionIndexAt(@NotNull Vector point);
+	protected abstract float refrIndexAt(@NotNull Vector point, boolean outside);
 
-	public static interface Index {
+	public static interface SurfaceIndex {
 	};
 
-	public static class IlluminationIndex implements Index {
+	public static class IllumIndex implements SurfaceIndex {
 
 		private float specular;
 		private float diffuse;
 		private float highlight;
 
-		public IlluminationIndex(float specular, float diffuse, float highlight) {
+		public IllumIndex(float specular, float diffuse, float highlight) {
 			specular = MathUtils.abs(specular);
 			diffuse = MathUtils.abs(diffuse);
 			highlight = MathUtils.abs(highlight);
@@ -116,26 +123,34 @@ public abstract class Surface implements Intersectable {
 	 * @author yuyuhzhao
 	 *
 	 */
-	public static class ColorIndex implements Index {
+	public static class IntensityIndex implements SurfaceIndex {
 
 		private float red;
 		private float green;
 		private float blue;
 
-		public ColorIndex() {
+		public IntensityIndex() {
 			red = 1;
 			green = 1;
 			blue = 1;
 		}
 
-		public ColorIndex(float red, float green, float blue) {
-			red = MathUtils.abs(red);
-			green = MathUtils.abs(green);
-			blue = MathUtils.abs(blue);
+		public IntensityIndex(float red, float green, float blue) {
+			red = Math.abs(red);
+			green = Math.abs(green);
+			blue = Math.abs(blue);
 			float max = MathUtils.max(red, green, blue, 1);
 			this.red = red / max;
 			this.green = green / max;
 			this.blue = blue / max;
+		}
+
+		public IntensityIndex complement() {
+			IntensityIndex comp = new IntensityIndex();
+			comp.setRed(1 - red);
+			comp.setGreen(1 - green);
+			comp.setBlue(1 - blue);
+			return this;
 		}
 
 		public float getRed() {
@@ -160,51 +175,6 @@ public abstract class Surface implements Intersectable {
 
 		public void setBlue(float blue) {
 			this.blue = blue;
-		}
-
-	}
-
-	public static class RefractionIndex implements Index {
-
-		private boolean transparent;
-		private float front;
-		private float back;
-
-		/**
-		 * Constructer if the surface is not transparent.
-		 */
-		public RefractionIndex() {
-			transparent = false;
-		}
-
-		public RefractionIndex(float front, float back) {
-			transparent = true;
-			this.front = Math.abs(front);
-			this.back = Math.abs(back);
-		}
-
-		public boolean isTransparent() {
-			return transparent;
-		}
-
-		public void setTransparent(boolean transparent) {
-			this.transparent = transparent;
-		}
-
-		public float getFront() {
-			return front;
-		}
-
-		public void setFront(float front) {
-			this.front = front;
-		}
-
-		public float getBack() {
-			return back;
-		}
-
-		public void setBack(float back) {
-			this.back = back;
 		}
 	}
 

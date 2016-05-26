@@ -7,21 +7,20 @@ import javax.validation.constraints.NotNull;
 
 import com.bankwel.j3d.raytracing.core.Constant;
 import com.bankwel.j3d.raytracing.core.Vector;
-import com.bankwel.j3d.raytracing.core.model.Surface.ColorIndex;
-import com.bankwel.j3d.raytracing.core.model.Surface.IlluminationIndex;
+import com.bankwel.j3d.raytracing.core.model.Surface.IllumIndex;
+import com.bankwel.j3d.raytracing.core.model.Surface.IntensityIndex;
+import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 public interface Source extends Geometry {
 
 	Intensity intensityAt(@NotNull Vector u, @NotNull Vector point, @NotNull Vector normal,
-			@NotNull IlluminationIndex illuminationIndex, @NotNull List<Intersectable> shelters);
+			@NotNull IllumIndex illuminationIndex, @NotNull List<Intersectable> shelters);
 
 	public static class Intensity {
 
 		private float red;
 		private float green;
 		private float blue;
-
-		private static float max = 1;
 
 		public Intensity() {
 			red = 0;
@@ -33,11 +32,10 @@ public interface Source extends Geometry {
 			this.red = red;
 			this.green = green;
 			this.blue = blue;
-			max = Math.max(max, max());
 		}
 
-		private float max() {
-			return Math.max(red, Math.max(green, blue));
+		public float max() {
+			return MathUtils.max(red, green, blue);
 		}
 
 		public Intensity decline(@NotNull Vector vec) {
@@ -48,16 +46,34 @@ public interface Source extends Geometry {
 			return new Intensity(red / f, green / f, blue / f);
 		}
 
-		public Intensity join(@NotNull Intensity intensity) {
-			return new Intensity(red + intensity.getRed(), green + intensity.green, blue + intensity.getBlue());
+		/**
+		 * operator '+=' </br>
+		 * 
+		 * @param intensity
+		 */
+		public void join(@NotNull Intensity intensity) {
+			red += intensity.getRed();
+			green += intensity.getGreen();
+			blue += intensity.getBlue();
+		}
+
+		/**
+		 * operator '*='</br>
+		 * 
+		 * @param index
+		 */
+		public void reduce(@NotNull IntensityIndex index) {
+			red *= index.getRed();
+			green *= index.getGreen();
+			blue *= index.getBlue();
 		}
 
 		public Intensity multiply(float rate) {
 			return new Intensity(red * rate, green * rate, blue * rate);
 		}
 
-		public Intensity reduce(@NotNull ColorIndex colorIndex) {
-			return new Intensity(red * colorIndex.getRed(), green * colorIndex.getGreen(), blue * colorIndex.getBlue());
+		public Intensity multiply(float r, float g, float b) {
+			return new Intensity(red * r, green * g, blue * b);
 		}
 
 		public float getRed() {

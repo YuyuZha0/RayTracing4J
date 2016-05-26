@@ -4,14 +4,14 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bankwel.j3d.raytracing.core.Pixel;
-import com.bankwel.j3d.raytracing.core.Ray;
-import com.bankwel.j3d.raytracing.core.Scene;
-import com.bankwel.j3d.raytracing.core.Vector;
-import com.bankwel.j3d.raytracing.core.model.Source.Intensity;
 import com.bankwel.j3d.raytracing.geometrys.PointSource;
 import com.bankwel.j3d.raytracing.geometrys.Plain;
 import com.bankwel.j3d.raytracing.geometrys.Sphere;
+import com.bankwel.j3d.raytracing.model.Pixel;
+import com.bankwel.j3d.raytracing.model.Ray;
+import com.bankwel.j3d.raytracing.model.Scene;
+import com.bankwel.j3d.raytracing.model.Vector;
+import com.bankwel.j3d.raytracing.model.core.Source.Intensity;
 import com.bankwel.j3d.raytracing.plugins.UI;
 
 public class App {

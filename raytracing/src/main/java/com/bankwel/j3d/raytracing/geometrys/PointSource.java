@@ -4,10 +4,10 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import com.bankwel.j3d.raytracing.core.Vector;
-import com.bankwel.j3d.raytracing.core.model.Intersectable;
-import com.bankwel.j3d.raytracing.core.model.Source;
-import com.bankwel.j3d.raytracing.core.model.Surface.IllumIndex;
+import com.bankwel.j3d.raytracing.model.Vector;
+import com.bankwel.j3d.raytracing.model.core.Intersectable;
+import com.bankwel.j3d.raytracing.model.core.Source;
+import com.bankwel.j3d.raytracing.model.core.Surface.IllumIndex;
 import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 public class PointSource implements Source {

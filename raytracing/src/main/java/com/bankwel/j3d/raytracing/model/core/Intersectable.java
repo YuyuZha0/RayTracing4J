@@ -1,10 +1,10 @@
-package com.bankwel.j3d.raytracing.core.model;
+package com.bankwel.j3d.raytracing.model.core;
 
 import javax.validation.constraints.NotNull;
 
-import com.bankwel.j3d.raytracing.core.Ray;
-import com.bankwel.j3d.raytracing.core.Scene;
-import com.bankwel.j3d.raytracing.core.Vector;
+import com.bankwel.j3d.raytracing.model.Ray;
+import com.bankwel.j3d.raytracing.model.Scene;
+import com.bankwel.j3d.raytracing.model.Vector;
 
 public interface Intersectable extends Geometry {
 

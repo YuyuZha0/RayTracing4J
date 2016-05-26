@@ -2,8 +2,8 @@ package com.bankwel.j3d.raytracing.geometrys;
 
 import javax.validation.constraints.NotNull;
 
-import com.bankwel.j3d.raytracing.core.Vector;
-import com.bankwel.j3d.raytracing.core.model.MonotoneSurface;
+import com.bankwel.j3d.raytracing.model.Vector;
+import com.bankwel.j3d.raytracing.model.core.MonotoneSurface;
 import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 public class Sphere extends MonotoneSurface {

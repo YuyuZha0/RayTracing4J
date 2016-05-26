@@ -1,11 +1,11 @@
-package com.bankwel.j3d.raytracing.core;
+package com.bankwel.j3d.raytracing.model;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 
-import com.bankwel.j3d.raytracing.core.model.Source.Intensity;
+import com.bankwel.j3d.raytracing.model.core.Source.Intensity;
 
 public class Pixel {
 

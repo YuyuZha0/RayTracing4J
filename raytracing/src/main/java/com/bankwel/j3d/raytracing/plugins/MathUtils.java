@@ -1,6 +1,6 @@
 package com.bankwel.j3d.raytracing.plugins;
 
-import com.bankwel.j3d.raytracing.core.Constant;
+import com.bankwel.j3d.raytracing.model.Constant;
 
 /**
  * 

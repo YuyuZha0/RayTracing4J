@@ -1,14 +1,14 @@
-package com.bankwel.j3d.raytracing.core.model;
+package com.bankwel.j3d.raytracing.model.core;
 
 import java.awt.Color;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import com.bankwel.j3d.raytracing.core.Constant;
-import com.bankwel.j3d.raytracing.core.Vector;
-import com.bankwel.j3d.raytracing.core.model.Surface.IllumIndex;
-import com.bankwel.j3d.raytracing.core.model.Surface.IntensityRate;
+import com.bankwel.j3d.raytracing.model.Constant;
+import com.bankwel.j3d.raytracing.model.Vector;
+import com.bankwel.j3d.raytracing.model.core.Surface.IllumIndex;
+import com.bankwel.j3d.raytracing.model.core.Surface.IntensityRate;
 import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 public interface Source extends Geometry {

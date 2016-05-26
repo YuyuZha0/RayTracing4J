@@ -1,4 +1,4 @@
-package com.bankwel.j3d.raytracing.core;
+package com.bankwel.j3d.raytracing.model;
 
 import com.bankwel.j3d.raytracing.plugins.MathUtils;
 

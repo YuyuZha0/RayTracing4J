@@ -1,9 +1,9 @@
-package com.bankwel.j3d.raytracing.core;
+package com.bankwel.j3d.raytracing.model;
 
 import javax.validation.constraints.NotNull;
 
-import com.bankwel.j3d.raytracing.core.Scene.Intersection;
-import com.bankwel.j3d.raytracing.core.model.Source.Intensity;
+import com.bankwel.j3d.raytracing.model.Scene.Intersection;
+import com.bankwel.j3d.raytracing.model.core.Source.Intensity;
 
 public class Ray {
 

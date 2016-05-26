@@ -1,4 +1,4 @@
-package com.bankwel.j3d.raytracing.core;
+package com.bankwel.j3d.raytracing.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,10 +8,10 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bankwel.j3d.raytracing.core.model.Geometry;
-import com.bankwel.j3d.raytracing.core.model.Intersectable;
-import com.bankwel.j3d.raytracing.core.model.Source;
-import com.bankwel.j3d.raytracing.core.model.Source.Intensity;
+import com.bankwel.j3d.raytracing.model.core.Geometry;
+import com.bankwel.j3d.raytracing.model.core.Intersectable;
+import com.bankwel.j3d.raytracing.model.core.Source;
+import com.bankwel.j3d.raytracing.model.core.Source.Intensity;
 import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 public class Scene {

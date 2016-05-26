@@ -1,6 +1,6 @@
-package com.bankwel.j3d.raytracing.core.model;
+package com.bankwel.j3d.raytracing.model.core;
 
-import com.bankwel.j3d.raytracing.core.Vector;
+import com.bankwel.j3d.raytracing.model.Vector;
 
 public abstract class MonotoneSurface extends Surface {
 

@@ -122,11 +122,15 @@ public class Ray {
 	}
 
 	public Ray trace(@NotNull Scene scene) {
-		if (depth > Constant.MAX_DEPTH)
+		if (depth > Constant.MAX_DEPTH) {
+			intensity.join(scene.getAmbient());
 			return this;
+		}
 		Intersection intersection = scene.closestIntersection(origin, direction);
-		if (intersection == null)
+		if (intersection == null) {
+			intensity.join(scene.getAmbient());
 			return this;
+		}
 		intersection.getRelevant().onIntersecting(this, scene, intersection.getPosition());
 		return this;
 	}

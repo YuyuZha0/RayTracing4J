@@ -18,9 +18,19 @@ public abstract class Surface implements Intersectable {
 	@Override
 	public final void onIntersecting(Ray ray, Scene scene, Vector point) {
 		Vector normal = normalAt(point);
+		computeIntensity(ray, scene, point, normal);
 		reflect(ray, scene, point, normal);
 		refract(ray, scene, point, normal);
-		computeIntensity(ray, scene, point, normal);
+	}
+
+	private void computeIntensity(Ray ray, Scene scene, Vector point, Vector normal) {
+		Intensity intensity = ray.getIntensity();
+		intensity.join(scene.getAmbient());
+		for (Source source : scene.getSources()) {
+			intensity.join(source.intensityAt(ray.getDirection(), point, normal, illuminationIndexAt(point),
+					scene.getSurfaces()));
+		}
+		intensity.reduce(reflRateAt(point));
 	}
 
 	private void reflect(Ray ray, Scene scene, Vector point, Vector normal) {
@@ -28,7 +38,7 @@ public abstract class Surface implements Intersectable {
 		if (r != null) {
 			r.setDepth(ray.getDepth() + 1);
 			r.trace(scene);
-			reduceIntensity(r, reflIndexAt(point));
+			r.getIntensity().reduce(reflRateAt(point));
 			ray.setSecondaryRefl(r);
 		}
 	}
@@ -41,30 +51,16 @@ public abstract class Surface implements Intersectable {
 		if (t != null) {
 			t.setDepth(ray.getDepth() + 1);
 			t.trace(scene);
-			reduceIntensity(t, reflIndexAt(point).complement());
+			t.getIntensity().reduce(reflRateAt(point).complement());
 			ray.setSecondaryTrans(t);
 		}
-	}
-
-	private void computeIntensity(Ray ray, Scene scene, Vector point, Vector normal) {
-		Intensity intensity = new Intensity();
-		for (Source source : scene.getSources()) {
-			intensity.join(source.intensityAt(ray.getDirection(), point, normal, illuminationIndexAt(point),
-					scene.getSurfaces()));
-		}
-		ray.setIntensity(intensity);
-		reduceIntensity(ray, reflIndexAt(point));
-	}
-
-	private void reduceIntensity(Ray ray, IntensityIndex index) {
-		ray.getIntensity().reduce(index);
 	}
 
 	protected abstract Vector normalAt(@NotNull Vector point);
 
 	protected abstract IllumIndex illuminationIndexAt(@NotNull Vector point);
 
-	protected abstract IntensityIndex reflIndexAt(@NotNull Vector point);
+	protected abstract IntensityRate reflRateAt(@NotNull Vector point);
 
 	protected abstract float refrIndexAt(@NotNull Vector point, boolean outside);
 
@@ -123,19 +119,19 @@ public abstract class Surface implements Intersectable {
 	 * @author yuyuhzhao
 	 *
 	 */
-	public static class IntensityIndex implements SurfaceIndex {
+	public static class IntensityRate implements SurfaceIndex {
 
 		private float red;
 		private float green;
 		private float blue;
 
-		public IntensityIndex() {
+		public IntensityRate() {
 			red = 1;
 			green = 1;
 			blue = 1;
 		}
 
-		public IntensityIndex(float red, float green, float blue) {
+		public IntensityRate(float red, float green, float blue) {
 			red = Math.abs(red);
 			green = Math.abs(green);
 			blue = Math.abs(blue);
@@ -145,8 +141,8 @@ public abstract class Surface implements Intersectable {
 			this.blue = blue / max;
 		}
 
-		public IntensityIndex complement() {
-			IntensityIndex comp = new IntensityIndex();
+		public IntensityRate complement() {
+			IntensityRate comp = new IntensityRate();
 			comp.setRed(1 - red);
 			comp.setGreen(1 - green);
 			comp.setBlue(1 - blue);

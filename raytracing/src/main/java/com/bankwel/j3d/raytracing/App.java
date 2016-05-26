@@ -10,7 +10,6 @@ import com.bankwel.j3d.raytracing.core.Scene;
 import com.bankwel.j3d.raytracing.core.Vector;
 import com.bankwel.j3d.raytracing.core.model.Source.Intensity;
 import com.bankwel.j3d.raytracing.geometrys.PointSource;
-import com.bankwel.j3d.raytracing.geometrys.AmbientSource;
 import com.bankwel.j3d.raytracing.geometrys.Plain;
 import com.bankwel.j3d.raytracing.geometrys.Sphere;
 import com.bankwel.j3d.raytracing.plugins.UI;
@@ -33,14 +32,13 @@ public class App {
 		Sphere sphere1 = new Sphere(new Vector(150, 100, 100), 90);
 		Sphere sphere2 = new Sphere(new Vector(200, 200, 100), 70);
 		Plain plain = new Plain(new Vector(w / 2, h / 2, 500), new Vector(0, -10, -1));
-		sphere1.illumination(1, 3, 1.4f).reflection(0.01f, 0.01f, 0.02f).refraction(1.9f);
-		sphere2.illumination(1, 1, 8).reflection(0.5f, 0.6f, 0.2f);
-		plain.illumination(1, 1, 1).reflection(0.4f, 0.4f, 0.4f);
+		sphere1.illumination(1, 10, 1.4f).reflection(0.1f, 0.1f, 0.1f).refraction(1.6f);
+		sphere2.illumination(1, 1, 8).reflection(0.3f, 0.2f, 0.6f);
+		plain.illumination(1, 1, 1).reflection(0.2f, 0.3f, 0.25f);
 
-		PointSource dot1 = new PointSource(new Vector(0, 0, -900), new Intensity(0.7f, 0.7f, 0.7f));
+		PointSource dot1 = new PointSource(new Vector(0, 0, -100), new Intensity(1, 1, 1));
 		PointSource dot2 = new PointSource(new Vector(500, 0, -600), new Intensity(0.3f, 0.4f, 0.8f));
-		AmbientSource ambient = new AmbientSource(new Intensity(0.2f, 0.2f, 0.2f));
-		scene.add(sphere1).add(sphere2).add(dot1).add(ambient).add(plain).add(dot2);
+		scene.add(sphere1).add(sphere2).add(plain).add(dot1).ambient(new Intensity(0.6f,0.6f,0.6f));
 		Vector viewPoint = new Vector(w / 2, h / 2, -1000);
 		pixels.forEach(pixel -> {
 			Intensity intensity = new Intensity();

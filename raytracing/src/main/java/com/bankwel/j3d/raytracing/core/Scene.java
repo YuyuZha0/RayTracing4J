@@ -11,24 +11,31 @@ import org.slf4j.LoggerFactory;
 import com.bankwel.j3d.raytracing.core.model.Geometry;
 import com.bankwel.j3d.raytracing.core.model.Intersectable;
 import com.bankwel.j3d.raytracing.core.model.Source;
+import com.bankwel.j3d.raytracing.core.model.Source.Intensity;
 import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 public class Scene {
 
 	private List<Source> sources = new ArrayList<Source>();
 	private List<Intersectable> surfaces = new ArrayList<Intersectable>();
+	private Intensity ambient = new Intensity();
 
 	private static final Logger logger = LoggerFactory.getLogger(Scene.class);
 
 	public Scene add(@NotNull Geometry geometry) {
 		if (geometry instanceof Source) {
 			sources.add((Source) geometry);
-			logger.info("Geometry recognized as Source.");
 		}
 		if (geometry instanceof Intersectable) {
 			surfaces.add((Intersectable) geometry);
-			logger.info("Geometry recognized as Intersectable.");
 		}
+		logger.info("Geometry recognized as {} has been added to the scene.", geometry.getClass());
+		return this;
+	}
+
+	public Scene ambient(@NotNull Intensity ambient) {
+		this.ambient = ambient;
+		logger.info("The ambient intensity has been set to {}.", ambient);
 		return this;
 	}
 
@@ -108,4 +115,13 @@ public class Scene {
 	public void setSurfaces(List<Intersectable> surfaces) {
 		this.surfaces = surfaces;
 	}
+
+	public Intensity getAmbient() {
+		return ambient;
+	}
+
+	public void setAmbient(Intensity ambient) {
+		this.ambient = ambient;
+	}
+
 }

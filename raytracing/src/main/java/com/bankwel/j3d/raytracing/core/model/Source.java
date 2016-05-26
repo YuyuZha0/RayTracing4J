@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import com.bankwel.j3d.raytracing.core.Constant;
 import com.bankwel.j3d.raytracing.core.Vector;
 import com.bankwel.j3d.raytracing.core.model.Surface.IllumIndex;
-import com.bankwel.j3d.raytracing.core.model.Surface.IntensityIndex;
+import com.bankwel.j3d.raytracing.core.model.Surface.IntensityRate;
 import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 public interface Source extends Geometry {
@@ -62,7 +62,7 @@ public interface Source extends Geometry {
 		 * 
 		 * @param index
 		 */
-		public void reduce(@NotNull IntensityIndex index) {
+		public void reduce(@NotNull IntensityRate index) {
 			red *= index.getRed();
 			green *= index.getGreen();
 			blue *= index.getBlue();

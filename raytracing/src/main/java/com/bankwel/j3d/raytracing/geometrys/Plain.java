@@ -4,7 +4,6 @@ import javax.validation.constraints.NotNull;
 
 import com.bankwel.j3d.raytracing.model.Vector;
 import com.bankwel.j3d.raytracing.model.core.MonotoneSurface;
-import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 public class Plain extends MonotoneSurface {
 

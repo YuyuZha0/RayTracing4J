@@ -5,7 +5,7 @@ import com.bankwel.j3d.raytracing.model.Vector;
 public abstract class MonotoneSurface extends Surface {
 
 	private IntensityRate intensityIndex = new IntensityRate();
-	private IllumIndex illuminationIndex = new IllumIndex(1, 1, 1);
+	private IlluminationIndex illuminationIndex = new IlluminationIndex(1, 1, 1);
 	private float refractIndex = 0;
 
 	public MonotoneSurface reflection(float red, float green, float blue) {
@@ -14,7 +14,7 @@ public abstract class MonotoneSurface extends Surface {
 	}
 
 	public MonotoneSurface illumination(float specular, float diffuse, float highlight) {
-		this.illuminationIndex = new IllumIndex(specular, diffuse, highlight);
+		this.illuminationIndex = new IlluminationIndex(specular, diffuse, highlight);
 		return this;
 	}
 
@@ -24,17 +24,17 @@ public abstract class MonotoneSurface extends Surface {
 	}
 
 	@Override
-	protected IllumIndex illuminationIndexAt(Vector point) {
+	protected final IlluminationIndex illuminationIndexAt(Vector point) {
 		return illuminationIndex;
 	}
 
 	@Override
-	protected IntensityRate reflRateAt(Vector point) {
+	protected final IntensityRate reflRateAt(Vector point) {
 		return intensityIndex;
 	}
 
 	@Override
-	protected float refrIndexAt(Vector point, boolean outside) {
+	protected final float refrIndexAt(Vector point, boolean outside) {
 		if (refractIndex <= 0)
 			return 0;
 		return outside ? refractIndex : 1 / refractIndex;

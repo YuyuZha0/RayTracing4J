@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 
-import com.bankwel.j3d.raytracing.model.core.Source.Intensity;
-
 public class Pixel {
 
 	private int x;

@@ -4,10 +4,10 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.bankwel.j3d.raytracing.model.Intensity;
 import com.bankwel.j3d.raytracing.model.Vector;
 import com.bankwel.j3d.raytracing.model.core.Intersectable;
 import com.bankwel.j3d.raytracing.model.core.Source;
-import com.bankwel.j3d.raytracing.model.core.Surface.IllumIndex;
 import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 public class PointSource implements Source {
@@ -21,18 +21,11 @@ public class PointSource implements Source {
 	}
 
 	@Override
-	public Intensity intensityAt(Vector u, Vector point, Vector normal, IllumIndex ii,
-			List<Intersectable> shelters) {
-		Vector L = position.sub(point);
-		Vector l = L.normalize();
-		if (isInShadow(point, l, L.length(), shelters))
-			return new Intensity();
-		float kd = ii.getDiffuse();
-		float ks = ii.getSpecular();
-		kd *= normal.dot(l);
-		Vector h = l.sub(u).normalize();
-		ks *= MathUtils.pow(normal.dot(h), ii.getHighlight());
-		return intensity.multiply(kd + ks).decline(L);
+	public Equivalent sourceAs(Vector point, List<Intersectable> shelters) {
+		Vector vector = position.sub(point);
+		if (isInShadow(point, vector.normalize(), vector.length(), shelters))
+			return new Equivalent();
+		return new Equivalent(intensity.copy().decline(vector), position);
 	}
 
 	private boolean isInShadow(Vector p0, Vector u, float max, List<Intersectable> shelters) {

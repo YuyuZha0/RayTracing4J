@@ -3,16 +3,12 @@ package com.bankwel.j3d.raytracing.model;
 import javax.validation.constraints.NotNull;
 
 import com.bankwel.j3d.raytracing.model.Scene.Intersection;
-import com.bankwel.j3d.raytracing.model.core.Source.Intensity;
 
 public class Ray {
 
 	private Vector origin;
 	private Vector direction;
 	private int depth = 1;
-
-	private Ray secondaryRefl = null;
-	private Ray secondaryTrans = null;
 
 	private Intensity intensity = new Intensity();
 
@@ -51,22 +47,6 @@ public class Ray {
 
 	public void setIntensity(Intensity intensity) {
 		this.intensity = intensity;
-	}
-
-	public Ray getSecondaryRefl() {
-		return secondaryRefl;
-	}
-
-	public void setSecondaryRefl(Ray secondaryRefl) {
-		this.secondaryRefl = secondaryRefl;
-	}
-
-	public Ray getSecondaryTrans() {
-		return secondaryTrans;
-	}
-
-	public void setSecondaryTrans(Ray secondaryTrans) {
-		this.secondaryTrans = secondaryTrans;
 	}
 
 	@Override
@@ -111,28 +91,15 @@ public class Ray {
 		return new Ray(i, u.mul(1 / index).sub(n.mul((float) (cosR - cosI / index))));
 	}
 
-	public Intensity countIntensity() {
-		Intensity itn = new Intensity();
-		itn.join(intensity);
-		if (secondaryRefl != null)
-			itn.join(secondaryRefl.countIntensity().decline(secondaryRefl.getOrigin().sub(origin)));
-		if (secondaryTrans != null)
-			itn.join(secondaryTrans.countIntensity().decline(secondaryTrans.getOrigin().sub(origin)));
-		return itn;
-	}
-
-	public Ray trace(@NotNull Scene scene) {
-		if (depth > Constant.MAX_DEPTH) {
-			intensity.join(scene.getAmbient());
-			return this;
-		}
+	public Intensity trace(@NotNull Scene scene) {
+		if (depth > Constant.MAX_DEPTH)
+			return intensity.join(scene.getAmbient());
 		Intersection intersection = scene.closestIntersection(origin, direction);
-		if (intersection == null) {
-			intensity.join(scene.getAmbient());
-			return this;
-		}
+		if (intersection == null)
+			return intensity.join(scene.getAmbient());
 		intersection.getRelevant().onIntersecting(this, scene, intersection.getPosition());
-		return this;
+		// return intensity;
+		return intensity.decline(intersection.getPosition().sub(origin));
 	}
 
 }

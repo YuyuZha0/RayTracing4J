@@ -47,4 +47,5 @@ public class MathUtils {
 	public static boolean lessThanZero(float f) {
 		return f <= -Constant.ZERO_APPROX;
 	}
+
 }

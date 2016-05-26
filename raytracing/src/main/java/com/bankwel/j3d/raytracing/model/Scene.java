@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import com.bankwel.j3d.raytracing.model.core.Geometry;
 import com.bankwel.j3d.raytracing.model.core.Intersectable;
 import com.bankwel.j3d.raytracing.model.core.Source;
-import com.bankwel.j3d.raytracing.model.core.Source.Intensity;
 import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 public class Scene {

@@ -2,10 +2,12 @@ package com.bankwel.j3d.raytracing.model.core;
 
 import javax.validation.constraints.NotNull;
 
+import com.bankwel.j3d.raytracing.model.Intensity;
 import com.bankwel.j3d.raytracing.model.Ray;
 import com.bankwel.j3d.raytracing.model.Scene;
 import com.bankwel.j3d.raytracing.model.Vector;
-import com.bankwel.j3d.raytracing.model.core.Source.Intensity;
+import com.bankwel.j3d.raytracing.model.core.Source.Equivalent;
+import com.bankwel.j3d.raytracing.plugins.IlluminationModel;
 import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 /**
@@ -18,47 +20,59 @@ public abstract class Surface implements Intersectable {
 	@Override
 	public final void onIntersecting(Ray ray, Scene scene, Vector point) {
 		Vector normal = normalAt(point);
-		computeIntensity(ray, scene, point, normal);
-		reflect(ray, scene, point, normal);
-		refract(ray, scene, point, normal);
+		IntensityRate rate = reflRateAt(point);
+		Intensity direct = directIntensity(scene, ray, point, normal);
+		Intensity reflect = reflectionIntensity(ray, scene, point, normal);
+		Intensity refract = refractIntensity(ray, scene, point, normal);
+		Intensity intensity = new Intensity();
+		intensity.join(scene.getAmbient()).join(direct).join(reflect).join(refract).reduce(rate)
+				.join(refract.reduce(rate.complement()));
+		ray.setIntensity(intensity);
 	}
 
-	private void computeIntensity(Ray ray, Scene scene, Vector point, Vector normal) {
-		Intensity intensity = ray.getIntensity();
-		intensity.join(scene.getAmbient());
-		for (Source source : scene.getSources()) {
-			intensity.join(source.intensityAt(ray.getDirection(), point, normal, illuminationIndexAt(point),
-					scene.getSurfaces()));
-		}
-		intensity.reduce(reflRateAt(point));
+	private Intensity reflectionIntensity(Ray ray, Scene scene, Vector point, Vector normal) {
+		Ray refl = ray.reflectedBy(point, normal);
+		if (refl == null)
+			return new Intensity();
+		refl.setDepth(ray.getDepth() + 1);
+		return refl.trace(scene);
 	}
 
-	private void reflect(Ray ray, Scene scene, Vector point, Vector normal) {
-		Ray r = ray.reflectedBy(point, normal);
-		if (r != null) {
-			r.setDepth(ray.getDepth() + 1);
-			r.trace(scene);
-			r.getIntensity().reduce(reflRateAt(point));
-			ray.setSecondaryRefl(r);
-		}
-	}
-
-	private void refract(Ray ray, Scene scene, Vector point, Vector normal) {
+	private Intensity refractIntensity(Ray ray, Scene scene, Vector point, Vector normal) {
 		float index = refrIndexAt(point, ray.getDirection().dot(normal) < 0);
+		Intensity intensity = new Intensity();
 		if (index <= 0)
-			return;
-		Ray t = ray.refractedBy(point, normal, index);
-		if (t != null) {
-			t.setDepth(ray.getDepth() + 1);
-			t.trace(scene);
-			t.getIntensity().reduce(reflRateAt(point).complement());
-			ray.setSecondaryTrans(t);
+			return intensity;
+		Ray trans = ray.refractedBy(point, normal, index);
+		if (trans == null)
+			return intensity;
+		trans.setDepth(ray.getDepth() + 1);
+		return intensity
+				.join(illuminationIntensity(trans.trace(scene), trans.getOrigin(), point, normal, ray.getDirection()));
+	}
+
+	private Intensity directIntensity(Scene scene, Ray ray, Vector point, Vector normal) {
+		Intensity intensity = new Intensity();
+		for (Source source : scene.getSources()) {
+			Equivalent equivalent = source.sourceAs(point, scene.getSurfaces());
+			if (!equivalent.isSheltered())
+				intensity.join(illuminationIntensity(equivalent.getIntensity(), equivalent.getCenter(), point, normal,
+						ray.getDirection()));
 		}
+		return intensity;
+	}
+
+	private Intensity illuminationIntensity(Intensity base, Vector center, Vector point, Vector normal, Vector in) {
+		IlluminationIndex index = illuminationIndexAt(point);
+		float ks = index.getSpecular();
+		float kd = index.getDiffuse();
+		kd *= IlluminationModel.lambert(normal, in);
+		return base.reduce(kd + ks);
 	}
 
 	protected abstract Vector normalAt(@NotNull Vector point);
 
-	protected abstract IllumIndex illuminationIndexAt(@NotNull Vector point);
+	protected abstract IlluminationIndex illuminationIndexAt(@NotNull Vector point);
 
 	protected abstract IntensityRate reflRateAt(@NotNull Vector point);
 
@@ -67,22 +81,19 @@ public abstract class Surface implements Intersectable {
 	public static interface SurfaceIndex {
 	};
 
-	public static class IllumIndex implements SurfaceIndex {
+	public static class IlluminationIndex implements SurfaceIndex {
 
 		private float specular;
 		private float diffuse;
 		private float highlight;
 
-		public IllumIndex(float specular, float diffuse, float highlight) {
+		public IlluminationIndex(float specular, float diffuse, float highlight) {
 			specular = MathUtils.abs(specular);
 			diffuse = MathUtils.abs(diffuse);
 			highlight = MathUtils.abs(highlight);
 
-			float z = specular + diffuse;
-			if (z == 0)
-				z = 1;
-			this.specular = specular / z;
-			this.diffuse = diffuse / z;
+			this.specular = specular;
+			this.diffuse = diffuse;
 			this.highlight = highlight;
 		}
 
@@ -146,7 +157,7 @@ public abstract class Surface implements Intersectable {
 			comp.setRed(1 - red);
 			comp.setGreen(1 - green);
 			comp.setBlue(1 - blue);
-			return this;
+			return comp;
 		}
 
 		public float getRed() {

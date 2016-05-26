@@ -1,115 +1,55 @@
 package com.bankwel.j3d.raytracing.model.core;
 
-import java.awt.Color;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import com.bankwel.j3d.raytracing.model.Constant;
+import com.bankwel.j3d.raytracing.model.Intensity;
 import com.bankwel.j3d.raytracing.model.Vector;
-import com.bankwel.j3d.raytracing.model.core.Surface.IllumIndex;
-import com.bankwel.j3d.raytracing.model.core.Surface.IntensityRate;
-import com.bankwel.j3d.raytracing.plugins.MathUtils;
 
 public interface Source extends Geometry {
 
-	Intensity intensityAt(@NotNull Vector u, @NotNull Vector point, @NotNull Vector normal,
-			@NotNull IllumIndex illuminationIndex, @NotNull List<Intersectable> shelters);
+	Equivalent sourceAs(@NotNull Vector point, @NotNull List<Intersectable> shelters);
 
-	public static class Intensity {
+	public static class Equivalent {
 
-		private float red;
-		private float green;
-		private float blue;
+		private boolean sheltered;
+		private Intensity intensity;
+		private Vector center;
 
-		public Intensity() {
-			red = 0;
-			green = 0;
-			blue = 0;
+		public Equivalent() {
+			sheltered = true;
 		}
 
-		public Intensity(float red, float green, float blue) {
-			this.red = red;
-			this.green = green;
-			this.blue = blue;
+		public Equivalent(@NotNull Intensity intensity, @NotNull Vector center) {
+			sheltered = false;
+			this.intensity = intensity;
+			this.center = center;
 		}
 
-		public float max() {
-			return MathUtils.max(red, green, blue);
+		public boolean isSheltered() {
+			return sheltered;
 		}
 
-		public Intensity decline(@NotNull Vector vec) {
-			float d = vec.length();
-			float f = new Vector(d * d, d, 1).dot(Constant.RAY_DECLINE_FACTOR);
-			if (f == 0)
-				throw new ArithmeticException();
-			return new Intensity(red / f, green / f, blue / f);
+		public void setSheltered(boolean sheltered) {
+			this.sheltered = sheltered;
 		}
 
-		/**
-		 * operator '+=' </br>
-		 * 
-		 * @param intensity
-		 */
-		public void join(@NotNull Intensity intensity) {
-			red += intensity.getRed();
-			green += intensity.getGreen();
-			blue += intensity.getBlue();
+		public Intensity getIntensity() {
+			return intensity;
 		}
 
-		/**
-		 * operator '*='</br>
-		 * 
-		 * @param index
-		 */
-		public void reduce(@NotNull IntensityRate index) {
-			red *= index.getRed();
-			green *= index.getGreen();
-			blue *= index.getBlue();
+		public void setIntensity(Intensity intensity) {
+			this.intensity = intensity;
 		}
 
-		public Intensity multiply(float rate) {
-			return new Intensity(red * rate, green * rate, blue * rate);
+		public Vector getCenter() {
+			return center;
 		}
 
-		public Intensity multiply(float r, float g, float b) {
-			return new Intensity(red * r, green * g, blue * b);
+		public void setCenter(Vector center) {
+			this.center = center;
 		}
-
-		public float getRed() {
-			return red;
-		}
-
-		public float getGreen() {
-			return green;
-		}
-
-		public float getBlue() {
-			return blue;
-		}
-
-		public Color toColor() {
-			return new Color(resize(red), resize(green), resize(blue));
-		}
-
-		private float resize(float value) {
-			value = Math.max(0, value);
-			value = Math.min(1, value);
-			return value;
-		}
-
-		@Override
-		public String toString() {
-			StringBuffer buffer = new StringBuffer();
-			buffer.append('(');
-			buffer.append(red);
-			buffer.append(',');
-			buffer.append(green);
-			buffer.append(',');
-			buffer.append(blue);
-			buffer.append(')');
-			return buffer.toString();
-		}
-
 	}
+
 }
